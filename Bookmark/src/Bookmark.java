@@ -1,12 +1,11 @@
 
 public class Bookmark {
-	
+
 	public static void main(String[] args) {
 		if (args.length == 0) {
-			//figure out the input flags and pass them
+			// figure out the input flags and pass them
 			new BookmarkCLI();
-		}
-		else {
+		} else {
 			new GUI();
 		}
 	}
