@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class MYSql {
@@ -35,12 +36,13 @@ public class MYSql {
 
 	}
 
-	public void setHomeServer() {
-		DB_Server = "jdbc:mysql//projectbirb.me:3306/cs370";
-	}
-
 	public void setLocalServer() {
 		DB_Server = "jdbc:mysql//localhost/CS370";
+	}
+	
+	public boolean existsDB() {
+		
+		return false;
 	}
 
 	public String createDB() {
@@ -65,8 +67,13 @@ public class MYSql {
 	}
 
 	public boolean closeConnection() {
-
-		return false;
+		try {
+			connection.close();
+			return true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	public void test() {
