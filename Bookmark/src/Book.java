@@ -2,8 +2,6 @@
  * Book
  * This class is as an object to store information about books used in the database.
  * @author Amzad
- * @version Phase 1
- * @Date 2-28-2018
  *
  */
 public class Book {
@@ -38,6 +36,16 @@ public class Book {
 	}
 	
 	public String getISBN() {
+		return ISBN10;
+	}
+	
+	public String setName(String newName) {
+		bookName = newName;
+		return bookName;
+	}
+	
+	public String setISBN10(String newISBN10) {
+		ISBN10 = newISBN10;
 		return ISBN10;
 	}
 	
