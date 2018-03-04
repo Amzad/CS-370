@@ -40,6 +40,10 @@ public class MYSql {
 		DB_Server = "jdbc:mysql//localhost/CS370";
 	}
 	
+	/**
+	 * Checks if the database exists.
+	 * @return True if the database exists
+	 */
 	public boolean existsDB() {
 		
 		return false;

@@ -103,6 +103,11 @@ public class Database {
 
 	}
 	
+	/**
+	 * Check of the ISBN10 is in the database
+	 * @param isbn The ISBN10 number to check
+	 * @return Returns true if it exists
+	 */
 	public boolean ifExists(String isbn) {
 		Iterator it = hmap.entrySet().iterator();
 		while (it.hasNext()) {

@@ -3,8 +3,6 @@
  * A program used to manage a collection of books.
  * 
  * @author Amzad
- * @version Phase 1
- * @Date 2-28-2018
  */
 
 
@@ -20,6 +18,7 @@ public class Bookmark {
 		args = new String[2]; // Fake cli args
 		args[0] = "-i";
 		args[1] = "input.txt";
+		
 		if (args.length >= 0) { 
 			new BookmarkCLI(args); // Start the CLI if arguments/flags are present.
 		} else {
