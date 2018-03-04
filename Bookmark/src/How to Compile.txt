@@ -1,0 +1,7 @@
+Open a new commandprompt window in this directory.
+Run:
+javac Bookmark.java
+to compile the program into the class files
+then run:
+java Bookmark -i input.txt 
+to start the program.
