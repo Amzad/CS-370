@@ -22,7 +22,7 @@ public class Book {
 	}
 	
 	/** 
-	 * The second construtor that allows you to create a book object with the title and ISBN10 of the book.
+	 * The second constructor that allows you to create a book object with the title and ISBN10 of the book.
 	 * @param name Title of the book
 	 * @param ISBN ISBN10 number of the book
 	 */
@@ -35,13 +35,13 @@ public class Book {
 		return bookName;
 	}
 	
-	public String getISBN() {
-		return ISBN10;
-	}
-	
 	public String setName(String newName) {
 		bookName = newName;
 		return bookName;
+	}
+	
+	public String getISBN10() {
+		return ISBN10;
 	}
 	
 	public String setISBN10(String newISBN10) {
@@ -49,5 +49,22 @@ public class Book {
 		return ISBN10;
 	}
 	
+	public String getISBN13() {
+		return ISBN13;
+	}
+	
+	public String setISBN13(String newISBN13) {
+		ISBN10 = newISBN13;
+		return ISBN10;
+	}
+	
+	public String getYear() {
+		return year;
+	}
+	
+	public String setYear(String newYear) {
+		year = newYear;
+		return year;
+	}
 
 }

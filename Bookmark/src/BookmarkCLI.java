@@ -1,3 +1,12 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 public class BookmarkCLI {
@@ -5,10 +14,16 @@ public class BookmarkCLI {
 	Scanner input;
 	String inputFile = null; // Stores input file name/location
 	String outputFile = null; // Stores output name/location
+	
+	FileReader loadFile;
+	BufferedReader readFile;
+	FileWriter makeFile;
+	BufferedWriter writeFile;
 
 	public BookmarkCLI(String[] args) {
 
 
+		db = new Database();
 
 		for (int i = 0; i < args.length; i++) { // A loop to cycle through the flags/parameters.
 
@@ -24,7 +39,9 @@ public class BookmarkCLI {
 
 		System.out.println("Creating database");
 		// Create a new HashMap database with the contents of the input file.
-		db = new Database(inputFile);
+		if (inputFile.length() > 0 ) {
+			readFile(inputFile);
+		}
 
 		System.out.println("Welcome to Bookmark! Press H for a list of available options.");
 		while (true) {
@@ -109,7 +126,7 @@ public class BookmarkCLI {
 					System.out.println("No valid parameter found for output. Please enter a file name followed by .txt");
 					outputFile = input.next();
 				}
-				db.writeFile(outputFile);
+				writeFile(outputFile);
 
 			} 
 
@@ -131,5 +148,77 @@ public class BookmarkCLI {
 
 		}	
 	}
+	
+	public void readFile(String file) {
+		String name;
+		String isbn;
+		
+		//File inputFile = new File(file);
+		try {
+			loadFile = new FileReader(file); // Load file into the FileReader
+			readFile = new BufferedReader(loadFile); // Read file into BufferedReader
+			System.out.println("File Found");
+			
+			String inputLine; // The current line being read.
+			String delimiter = "[|]"; // Book titles rarely have separators.
+			
+			// If the line isn't empty, process the data.
+			while ((inputLine = readFile.readLine()) != null) {
+				String[] info = inputLine.split(delimiter);
+				isbn = info[0].trim(); // Remove starting and trailing white spaces.
+				name = info[1].trim(); // Remove starting and trailing white spaces.
+				
+				Book tempBook = new Book(name, isbn); // Create a new Book object with the name and isbn10 number
+				db.add(tempBook); // Add the new Book object to the database.
+				System.out.println(tempBook.getbookName() + " added to the database");
+			}
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+			//e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Unable to access file");
+			//e.printStackTrace();
+		}
+		finally {
+			try {
+				readFile.close();
+				loadFile.close();
+			} catch (IOException e) {
+				System.out.println("Unable to close file");
+				//e.printStackTrace();
+			}
+		}
+		System.out.println("Database creation completed");
+	} // END:readFile
+	
+	public void writeFile(String outputFile) {
+		try {
+			makeFile = new FileWriter(outputFile);
+			writeFile = new BufferedWriter(makeFile);
+			HashMap hmap = db.getDatabase();
+			Iterator it = hmap.entrySet().iterator();
+			while (it.hasNext()) {
+
+				Map.Entry pair = (Map.Entry)it.next();
+				Book temp = (Book) pair.getValue();
+				
+				writeFile.write(temp.getISBN10() + "|" + temp.getbookName());
+				writeFile.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				writeFile.close();
+				makeFile.close();
+				System.out.println("Output file written to " + outputFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	} // END: writeFile
 
 }
