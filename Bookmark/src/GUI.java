@@ -21,8 +21,11 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.FlowLayout;
 import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.JButton;
 import java.awt.Component;
+import java.awt.ScrollPane;
+import javax.swing.JTable;
 
 public class GUI {
 	JFrame jFrame = new JFrame("Bookmark");
@@ -32,6 +35,7 @@ public class GUI {
 	public GUI() {
 		jFrame.setSize(700, 500);
 		jFrame.setLocationRelativeTo(null);
+		jFrame.getContentPane().setLayout(new FlowLayout());
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 
 		JMenuBar menuBar = new JMenuBar();
@@ -91,6 +95,26 @@ public class GUI {
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.add("Home", homePanel);
+		
+		
+		DefaultTableModel tModel = new DefaultTableModel();
+		JTable bookTable = new JTable();
+		bookTable.doLayout();
+		bookTable.setFillsViewportHeight(true);
+		String[] Column = {"Title", "Author"};
+		bookTable.setModel(tModel);
+		
+		
+		ScrollPane scrollPane_1 = new ScrollPane();
+		scrollPane_1.add(bookTable);
+		homePanel.add(scrollPane_1);
+		
+		tModel.addColumn("Title");
+		tModel.addColumn("Author");
+		tModel.addRow(Column);
+		
+		
+		
 		tabbedPane.add("Admin", adminPanel);
 		
 		JLabel lblS = new JLabel("System Log");
@@ -98,8 +122,8 @@ public class GUI {
 		
 		textAreaSystemLog = new JTextArea();
 		textAreaSystemLog.setEditable(false);
-		textAreaSystemLog.setRows(10);
-		textAreaSystemLog.setColumns(83);
+		//textAreaSystemLog.setRows(10);
+		//textAreaSystemLog.setColumns(83);
 		JScrollPane scrollPane = new JScrollPane(textAreaSystemLog);
 		
 		adminPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
