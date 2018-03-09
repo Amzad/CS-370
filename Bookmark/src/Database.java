@@ -38,6 +38,11 @@ public class Database {
 		
 	}
 	
+	public Book newBook(String isbn10, String name, String author, String year) {
+	    Book newBook = new Book(isbn10, name, author, year);
+	    return newBook;
+	}
+	
 	/**
 	 * Modifies the ISBN10 number of an existing book
 	 * @param isbn The current ISBN10 number

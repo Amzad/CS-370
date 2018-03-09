@@ -31,6 +31,13 @@ public class Book {
 		ISBN10 = ISBN;
 	}
 	
+	public Book(String ISBN10, String name, String author, String year) {
+        bookName = name;
+        this.ISBN10 = ISBN10;
+        this.author = author;
+        this.year = year;
+    }
+	
 	public String getbookName() {
 		return bookName;
 	}
@@ -39,6 +46,15 @@ public class Book {
 		bookName = newName;
 		return bookName;
 	}
+	
+	public String getAuthor() {
+        return author;
+    }
+    
+    public String setAuthor(String newAuthor) {
+        author = newAuthor;
+        return author;
+    }
 	
 	public String getISBN10() {
 		return ISBN10;
@@ -66,5 +82,7 @@ public class Book {
 		year = newYear;
 		return year;
 	}
+	
+	
 
 }

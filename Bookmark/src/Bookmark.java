@@ -173,6 +173,7 @@ public class Bookmark extends Thread {
     public static void importFile() {
 
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.changeToParentDirectory();
         int fileChosen = fileChooser.showOpenDialog(null);
 
         if (fileChosen == JFileChooser.APPROVE_OPTION) {
@@ -180,7 +181,7 @@ public class Bookmark extends Thread {
             gui.print(selectedFile.getAbsolutePath() + " file picked.");
             try {
 
-                String isbn, name;
+                String isbn, name, author, year;
                 loadFile = new FileReader(selectedFile); // Load file into the FileReader
                 readFile = new BufferedReader(loadFile); // Read file into BufferedReader
 
@@ -193,10 +194,14 @@ public class Bookmark extends Thread {
                     String[] info = inputLine.split(delimiter);
                     isbn = info[0].trim(); // Remove starting and trailing white spaces.
                     name = info[1].trim(); // Remove starting and trailing white spaces.
+                    author = info[2].trim();
+                    year = info[3].trim();
 
-                    Book newBook = new Book(name, isbn); // Create a new Book object with the name and isbn10 number
+                    Book newBook = new Book(isbn, name, author, year); // Create a new Book object with the name and isbn10 number
                     db.add(newBook); // Add the new Book object to the database.
                     gui.print(newBook.getbookName() + " added to the database");
+                    String[] data = {newBook.getbookName(), newBook.getAuthor(), newBook.getYear(), newBook.getISBN10()};
+                    gui.addRow(data);
                 }
 
 
