@@ -13,6 +13,15 @@ import java.util.Map;
 public class Database {
 	HashMap<String, Object> hmap = new HashMap<String, Object>();
 	
+	/* Database Array Index Order
+	 * 
+	 * 0 - ISBN10
+	 * 1 - ISBN13
+	 * 2 - Title
+	 * 3 - Author
+	 * 4 - Published Year
+	 * 5 - Publisher
+	 */
 	public Database() {
 		
 	}
@@ -47,8 +56,9 @@ public class Database {
 	 * Modifies the ISBN10 number of an existing book
 	 * @param isbn The current ISBN10 number
 	 * @param newISBN10 The new ISBN10 number
+	 * @throws CloneNotSupportedException 
 	 */
-	public Book modifyBookISBN(String isbn, String newISBN) {
+	public Book modifyBookISBN(String isbn, String newISBN) throws CloneNotSupportedException {
 		Iterator it = hmap.entrySet().iterator();
 		while (it.hasNext()) {
 
@@ -57,8 +67,7 @@ public class Database {
 			
 			// Find the isbn10 number to change.
 			if (temp.getISBN10().equals(isbn)) {
-				Book oldBook = new Book(temp.getISBN10()); // Get current book object to return for later.
-				
+				Book oldBook = temp.clone();
 				temp.setISBN10(newISBN); // Set new isbn10 number
 				return oldBook;
 				
@@ -72,7 +81,7 @@ public class Database {
 	 * @param isbn ISBN10 number of the book to modify
 	 * @param newName New title for the book
 	 */
-	public Book modifyBookName(String isbn, String newName) {
+	public Book modifyBookName(String isbn, String newTitle) {
 		Iterator it = hmap.entrySet().iterator();
 		while (it.hasNext()) {
 
@@ -81,9 +90,9 @@ public class Database {
 			
 			// Find the isbn10 number to change.
 			if (temp.getISBN10().equals(isbn)) {
-				Book oldBook = new Book(temp.getbookName(), temp.getISBN10()); // Get current book object to return for later.
+				Book oldBook = new Book(temp.getTitle(), temp.getISBN10()); // Get current book object to return for later.
 
-				temp.setName(newName); // Set new isbn10 number
+				temp.setTitle(newTitle); // Set new isbn10 number
 				//System.out.println("Title:" + oldName + " changed to Title:" + newName + " for " + temp.getISBN());
 				return oldBook;
 			}
@@ -98,7 +107,7 @@ public class Database {
 	public void remove(String isbn) {
 
 		Book temp = (Book) hmap.remove(isbn);
-		System.out.println(temp.getbookName() + " deleted");
+		System.out.println(temp.getTitle() + " deleted");
 		
 
 	}
@@ -139,7 +148,7 @@ public class Database {
 			Map.Entry pair = (Map.Entry)it.next();
 			Book temp = (Book) pair.getValue();
 			
-			System.out.println(temp.getISBN10() + " " + temp.getbookName());
+			System.out.println(temp.getISBN10() + " " + temp.getTitle());
 		}
 	}
 	

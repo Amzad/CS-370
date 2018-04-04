@@ -20,7 +20,7 @@ public class BookmarkCLI {
 	FileWriter makeFile;
 	BufferedWriter writeFile;
 
-	public BookmarkCLI(String[] args) {
+	public BookmarkCLI(String[] args) throws CloneNotSupportedException {
 
 
 		db = new Database();
@@ -98,14 +98,14 @@ public class BookmarkCLI {
 						
 						
 						Book oldBook = db.modifyBookISBN(isbn, newISBN);
-						System.out.println("ISBN10:" + isbn + " changed to ISBN10:" + newISBN + " for " + oldBook.getbookName());
+						System.out.println("ISBN10:" + isbn + " changed to ISBN10:" + newISBN + " for " + oldBook.getTitle());
 						
 						
 					} else if (option.toLowerCase().equals("n")) {
 						System.out.println("Enter the new book title");
 						newName = input.nextLine();
 						Book oldBook = db.modifyBookName(isbn, newName);
-						System.out.println("Title:" + oldBook.getbookName() + " changed to Title:" + newName + " for " + isbn);
+						System.out.println("Title:" + oldBook.getTitle() + " changed to Title:" + newName + " for " + isbn);
 					} else {
 						System.out.println("Invalid input. Try again.");
 					}
@@ -170,7 +170,7 @@ public class BookmarkCLI {
 				
 				Book tempBook = new Book(name, isbn); // Create a new Book object with the name and isbn10 number
 				db.add(tempBook); // Add the new Book object to the database.
-				System.out.println(tempBook.getbookName() + " added to the database");
+				System.out.println(tempBook.getTitle() + " added to the database");
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -203,7 +203,7 @@ public class BookmarkCLI {
 				Map.Entry pair = (Map.Entry)it.next();
 				Book temp = (Book) pair.getValue();
 				
-				writeFile.write(temp.getISBN10() + "|" + temp.getbookName());
+				writeFile.write(temp.getISBN10() + "|" + temp.getTitle());
 				writeFile.newLine();
 			}
 		} catch (IOException e) {

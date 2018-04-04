@@ -28,10 +28,10 @@ import javax.swing.JButton;
 import java.awt.Component;
 import java.awt.ScrollPane;
 import javax.swing.JTable;
-import net.miginfocom.swing.MigLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import javax.swing.JSeparator;
 
 public class GUI {
 	JFrame jFrame = new JFrame("Bookmark");
@@ -40,6 +40,7 @@ public class GUI {
 	DefaultTableModel tModel;
 
 	public GUI() {
+		jFrame.setResizable(false);
 		jFrame.setSize(700, 600);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.getContentPane().setLayout(new FlowLayout());
@@ -74,6 +75,12 @@ public class GUI {
 				System.exit(0);
 			}
 		});
+		
+		JMenuItem mntmGenerateReport = new JMenuItem("Generate Report");
+		mnFile.add(mntmGenerateReport);
+		
+		JSeparator separator = new JSeparator();
+		mnFile.add(separator);
 		mnFile.add(mntmExit);
 
 		JMenu mnNewMenu = new JMenu("Edit");
@@ -92,7 +99,7 @@ public class GUI {
 		panel.add(lblSearch);
 		textFieldSearch = new JTextField();
 		panel.add(textFieldSearch);
-		textFieldSearch.setColumns(70);
+		textFieldSearch.setColumns(50);
 		
 		// TabbedPane START
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -112,10 +119,15 @@ public class GUI {
 		
 		
 		// Add the columns
+		tModel.addColumn("ISBN13");
+		tModel.addColumn("ISBN10");
 		tModel.addColumn("Title");
 		tModel.addColumn("Author");
 		tModel.addColumn("Year");
-		tModel.addColumn("ISBN10");
+		tModel.addColumn("Publisher");
+		tModel.addColumn("Link");
+		tModel.addColumn("Pages");
+		
 		
 		homePanel.add(scrollPaneTable);
 		
@@ -155,14 +167,22 @@ public class GUI {
 		
 	}
 	
+	public void print(int message) {
+		textAreaSystemLog.append(message + "\n");
+		
+	}
+	
 	public void searchTab(String term) {
 		
 	}
 	
 	public void addRow(String[] data) {
-	    //String[] bookData = {"Charlotte's Web", "EB White", "2000", "1234567890"};
 	    tModel.addRow(data);
 	    
+	}
+	
+	public DefaultTableModel getModel() {
+		return tModel;
 	}
 
 }

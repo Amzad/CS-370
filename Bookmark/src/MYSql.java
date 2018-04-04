@@ -91,9 +91,9 @@ public class MYSql {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 
-			System.out.println("Trying DB Connection");
+			Bookmark.gui.print("Trying DB Connection");
 			connection = DriverManager.getConnection(DB_Server, DBusername, DBpassword);
-			System.out.print("Connection Established");
+			Bookmark.gui.print("Connection Established");
 			return true;
 
 		} catch (Exception e) {

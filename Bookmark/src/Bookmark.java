@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Bookmark
@@ -31,17 +32,22 @@ public class Bookmark extends Thread {
      */
 
     static GUI gui;
+    static MYSql netdb;
     static Database db;
     static FileReader loadFile;
     static BufferedReader readFile;
     static FileWriter makeFile;
     static BufferedWriter writeFile;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CloneNotSupportedException {
 
-        //args = new String[2]; // Fake cli args
-        //args[0] = "-i";
-        //args[1] = "input.txt";
+        /*args = new String[2]; // Fake cli args
+        args[0] = "-i";
+        args[1] = "input.txt";*/
+    	
+    	/* Order for elements
+    	ISBN13, ISBN10, Title, Author, Year, Publisher, Pages, Link
+    	*/
 
         if (args.length > 0) { 
             new BookmarkCLI(args); // Start the CLI if arguments/flags are present.
@@ -52,6 +58,7 @@ public class Bookmark extends Thread {
                 public void run() {
                     gui = new GUI();
                     loadCache();
+                    netdb = new MYSql();
                 }
             }.start();
             //gui = new GUI(); // Start the GUI is no arguments/flags are found.
@@ -66,7 +73,8 @@ public class Bookmark extends Thread {
         String file = "database.txt";
         try {
 
-            String isbn, name;
+            String isbn13, isbn10, title, author, year, publisher, link, pages;
+
             loadFile = new FileReader(file); // Load file into the FileReader
             readFile = new BufferedReader(loadFile); // Read file into BufferedReader
             gui.print("Cache Found. Loading Cache");
@@ -75,19 +83,30 @@ public class Bookmark extends Thread {
             String delimiter = "[|]"; // Book titles rarely have separators.
 
             // If the line isn't empty, process the data.
+            
             while ((inputLine = readFile.readLine()) != null) {
                 String[] info = inputLine.split(delimiter);
-                isbn = info[0].trim(); // Remove starting and trailing white spaces.
-                name = info[1].trim(); // Remove starting and trailing white spaces.
+                isbn13 = info[0].trim();
+                isbn10 = info[1].trim(); // Remove starting and trailing white spaces.
+                title = info[2].trim(); // Remove starting and trailing white spaces.
+                author = info[3].trim();
+                year = info[4].trim();
+                publisher = info[5].trim();
+                link = info[6].trim();
+                pages = info[7].trim();
 
-                Book tempBook = new Book(name, isbn); // Create a new Book object with the name and isbn10 number
+                Book tempBook = new Book(isbn13, isbn10, title, author, year, publisher, link, pages); // Create a new Book object with the name and isbn10 number
                 db.add(tempBook); // Add the new Book object to the database.
+                String[] data = {tempBook.getISBN13(), tempBook.getISBN10(), tempBook.getTitle(), tempBook.getAuthor(), tempBook.getYear(), tempBook.getPublisher(), tempBook.getLink(), tempBook.getPages()};
+                
+                
+                gui.addRow(data);
             }
             gui.print("Cache loaded");
 
 
         } catch (FileNotFoundException e) {
-            gui.print("Database doesn't exist");
+            gui.print("Cache not found.");
         } catch (IOException e) {
             gui.print("Unable to read or write to file.");
         }
@@ -109,23 +128,29 @@ public class Bookmark extends Thread {
         gui.print("Starting state save.");
 
         try {
-            makeFile = new FileWriter("database.txt", true);
+        	//File check = new File()
+            makeFile = new FileWriter("database.txt", false);
             writeFile = new BufferedWriter(makeFile);
+
 
             HashMap<String, Book> hmap = db.getDatabase();
 
             Iterator<Entry<String, Book>> it = hmap.entrySet().iterator();
             while (it.hasNext()) {
-
                 Map.Entry pair = (Map.Entry)it.next();
                 Book temp = (Book) pair.getValue();
-
-                writeFile.write(temp.getISBN10() + "|" + 
-                        temp.getISBN13() + "|" +
-                        temp.getbookName() + "|" +
-                        temp.getYear() + "|" 
+                //gui.print(temp.getTitle());
+                writeFile.write(temp.getISBN13() + "|" + 
+                        temp.getISBN10() + "|" +
+                        temp.getTitle() + "|" +
+                        temp.getAuthor() + "|" +
+                        temp.getYear() + "|" +
+                        temp.getPublisher() + "|" +
+                        temp.getLink() + "|" +
+                        temp.getPages()
                         );
                 writeFile.newLine();
+                
             }
 
 
@@ -141,6 +166,7 @@ public class Bookmark extends Thread {
                 gui.print("Current state saved");
             } catch (IOException e) {
                 gui.print("Unable to access file");
+                System.out.println(e);
             }
 
 
@@ -169,6 +195,18 @@ public class Bookmark extends Thread {
             e.printStackTrace();
         }
     }
+    
+    public static boolean bookExists(Book checkBook) {
+    	boolean exists = false;
+    	DefaultTableModel tModel = gui.getModel();
+    	
+    	for (int count = 0; count < tModel.getRowCount(); count++) {
+    		if (checkBook.getISBN13().equals(tModel.getValueAt(count, 0))) {
+    			exists = true;
+    		}
+    	}
+    	return exists;
+    }
 
     public static void importFile() {
 
@@ -181,7 +219,7 @@ public class Bookmark extends Thread {
             gui.print(selectedFile.getAbsolutePath() + " file picked.");
             try {
 
-                String isbn, name, author, year;
+            	String isbn13, isbn10, title, author, year, publisher, link, pages;
                 loadFile = new FileReader(selectedFile); // Load file into the FileReader
                 readFile = new BufferedReader(loadFile); // Read file into BufferedReader
 
@@ -189,19 +227,39 @@ public class Bookmark extends Thread {
                 String inputLine; // The current line being read.
                 String delimiter = "[|]"; // Book titles rarely have separators.
 
+                
                 // If the line isn't empty, process the data.
                 while ((inputLine = readFile.readLine()) != null) {
                     String[] info = inputLine.split(delimiter);
-                    isbn = info[0].trim(); // Remove starting and trailing white spaces.
-                    name = info[1].trim(); // Remove starting and trailing white spaces.
-                    author = info[2].trim();
-                    year = info[3].trim();
+                    isbn13 = info[0].trim();
+                    isbn10 = info[1].trim(); // Remove starting and trailing white spaces.
+                    title = info[2].trim(); // Remove starting and trailing white spaces.
+                    author = info[3].trim();
+                    year = info[4].trim();
+                    publisher = info[5].trim();
+                    link = info[6].trim();
+                    pages = info[7].trim();
 
-                    Book newBook = new Book(isbn, name, author, year); // Create a new Book object with the name and isbn10 number
+                    Book newBook = new Book(isbn13, isbn10, title, author, year, publisher, link, pages); // Create a new Book object with the name and isbn10 number
+
+                    //Book newBook = new Book(isbn, name, author, year); // Create a new Book object with the name and isbn10 number
                     db.add(newBook); // Add the new Book object to the database.
-                    gui.print(newBook.getbookName() + " added to the database");
-                    String[] data = {newBook.getbookName(), newBook.getAuthor(), newBook.getYear(), newBook.getISBN10()};
-                    gui.addRow(data);
+                    
+                    
+
+                    if (bookExists(newBook)) {
+                    	gui.print("Existing Book found. Skipping book");
+                    }
+                    else {
+                    	String[] data = {newBook.getISBN13(), newBook.getISBN10(), newBook.getTitle(), newBook.getAuthor(), newBook.getYear(), newBook.getPublisher(), newBook.getLink(), newBook.getPages()};
+                    	gui.addRow(data);
+                    	gui.print(newBook.getTitle() + " added to the database");
+                    }
+
+            	   
+            	    	
+            	    
+                    
                 }
 
 
@@ -209,12 +267,15 @@ public class Bookmark extends Thread {
                 gui.print("Database doesn't exist");
             } catch (IOException e) {
                 gui.print("Unable to read or write to file.");
+            } catch (ArrayIndexOutOfBoundsException e) {
+            	gui.print("Invalid file imported.");
             }
 
             finally {
                 try {
                     readFile.close();
                     loadFile.close();
+                    saveCurrentState();
                 } catch (IOException e) {
                     gui.print("Unable to close files.");
                 }
@@ -244,7 +305,15 @@ public class Bookmark extends Thread {
                     Map.Entry pair = (Map.Entry)it.next();
                     Book temp = (Book) pair.getValue();
 
-                    writeFile.write(temp.getISBN10() + "|" + temp.getbookName());
+                    writeFile.write(temp.getISBN13() + "|" + 
+                    				temp.getISBN13() + "|" + 
+                    				temp.getTitle() + "|" + 
+                    				temp.getAuthor() + "|" + 
+                    				temp.getYear() + "|" + 
+                    				temp.getPublisher() + "|" + 
+                    				temp.getLink() + "|" + 
+                    				temp.getPages()
+                    				);
                     writeFile.newLine();
                 }
 
