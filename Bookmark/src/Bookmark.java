@@ -97,8 +97,8 @@ public class Bookmark extends Thread {
 
                 Book tempBook = new Book(isbn13, isbn10, title, author, year, publisher, link, pages); // Create a new Book object with the name and isbn10 number
                 db.add(tempBook); // Add the new Book object to the database.
-                String[] data = {tempBook.getISBN13(), tempBook.getISBN10(), tempBook.getTitle(), tempBook.getAuthor(), tempBook.getYear(), tempBook.getPublisher(), tempBook.getLink(), tempBook.getPages()};
-                
+                //String[] data = {tempBook.getISBN13(), tempBook.getISBN10(), tempBook.getTitle(), tempBook.getAuthor(), tempBook.getYear(), tempBook.getPublisher(), tempBook.getLink(), tempBook.getPages()};
+                String[] data = {tempBook.getISBN13(), tempBook.getTitle(), tempBook.getAuthor()};
                 
                 gui.addRow(data);
             }
@@ -153,9 +153,6 @@ public class Bookmark extends Thread {
                 
             }
 
-
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -173,25 +170,16 @@ public class Bookmark extends Thread {
         }
     }
 
-
-
-
-
-
     public static void setSystemLook() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (UnsupportedLookAndFeelException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -251,7 +239,8 @@ public class Bookmark extends Thread {
                     	gui.print("Existing Book found. Skipping book");
                     }
                     else {
-                    	String[] data = {newBook.getISBN13(), newBook.getISBN10(), newBook.getTitle(), newBook.getAuthor(), newBook.getYear(), newBook.getPublisher(), newBook.getLink(), newBook.getPages()};
+                    	String[] data = {newBook.getISBN13(), newBook.getTitle(), newBook.getAuthor()};
+                    	//String[] data = {newBook.getISBN13(), newBook.getISBN10(), newBook.getTitle(), newBook.getAuthor(), newBook.getYear(), newBook.getPublisher(), newBook.getLink(), newBook.getPages()};
                     	gui.addRow(data);
                     	gui.print(newBook.getTitle() + " added to the database");
                     }

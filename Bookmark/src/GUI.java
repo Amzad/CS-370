@@ -24,6 +24,7 @@ import java.awt.GridLayout;
 
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.JButton;
 import java.awt.Component;
 import java.awt.ScrollPane;
@@ -32,16 +33,19 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JSeparator;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class GUI {
 	JFrame jFrame = new JFrame("Bookmark");
 	private JTextField textFieldSearch;
 	JTextArea textAreaSystemLog;
 	DefaultTableModel tModel;
-
+	JTabbedPane tabbedPane;
+	
 	public GUI() {
 		jFrame.setResizable(false);
-		jFrame.setSize(700, 600);
+		jFrame.setSize(900, 600);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.getContentPane().setLayout(new FlowLayout());
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -102,15 +106,17 @@ public class GUI {
 		textFieldSearch.setColumns(50);
 		
 		// TabbedPane START
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		// Home Tab
-		JPanel homePanel = new JPanel(); 
-		tabbedPane.add("Home", homePanel);
+		JPanel homePanel = new JPanel();
+		tabbedPane.add("My Library", homePanel);
 		
 		
 		tModel = new DefaultTableModel();
 		JTable bookTable = new JTable();
+		bookTable.setPreferredScrollableViewportSize(new Dimension(750, 450));
 		JScrollPane scrollPaneTable = new JScrollPane(bookTable);
+		//homePanel.setSize(900, 500);
 		
 		
 		bookTable.setModel(tModel);
@@ -120,34 +126,23 @@ public class GUI {
 		
 		// Add the columns
 		tModel.addColumn("ISBN13");
-		tModel.addColumn("ISBN10");
+		//tModel.addColumn("ISBN10");
 		tModel.addColumn("Title");
 		tModel.addColumn("Author");
-		tModel.addColumn("Year");
-		tModel.addColumn("Publisher");
-		tModel.addColumn("Link");
-		tModel.addColumn("Pages");
+		
+		//tModel.addColumn("Year");
+		//tModel.addColumn("Publisher");
+		//tModel.addColumn("Link");
+		//tModel.addColumn("Pages");
+		
+		// Create but hide the isbn13 for easy data processing
+		TableColumnModel cModel = bookTable.getColumnModel();
+		cModel.removeColumn(cModel.getColumn(0));
 		
 		
 		homePanel.add(scrollPaneTable);
-		
-		
-		// Admin Tab
-        JPanel adminPanel = new JPanel();
-        
-		tabbedPane.add("Admin", adminPanel);
-		adminPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		
-		textAreaSystemLog = new JTextArea();
-		textAreaSystemLog.setRows(10);
-		textAreaSystemLog.setColumns(60);
-		textAreaSystemLog.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(textAreaSystemLog);
-		adminPanel.add(scrollPane);
-		
 		JPanel panel_1 = new JPanel();
-		scrollPane.setColumnHeaderView(panel_1);
 		
 		JButton btnClearLogs = new JButton("Clear logs");
 		panel_1.add(btnClearLogs);
@@ -160,6 +155,30 @@ public class GUI {
 		jFrame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		jFrame.setVisible(true);
+		
+		enableAdmin(true);
+		searchTab();
+		
+		
+	}
+	
+	public void enableAdmin(boolean value) {
+		JPanel adminPanel = new JPanel();
+		tabbedPane.add("Admin", adminPanel);
+		adminPanel.setLayout(null);
+
+		textAreaSystemLog = new JTextArea();
+		textAreaSystemLog.setRows(10);
+		textAreaSystemLog.setColumns(60);
+		textAreaSystemLog.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(textAreaSystemLog);
+		scrollPane.setBounds(10, 41, 486, 186);
+		adminPanel.add(scrollPane);
+		
+		JLabel lblTransactionalLog = new JLabel("Transaction Log");
+		lblTransactionalLog.setBounds(10, 26, 96, 14);
+		adminPanel.add(lblTransactionalLog);
+		
 	}
 	
 	public void print(String message) {
@@ -172,7 +191,57 @@ public class GUI {
 		
 	}
 	
-	public void searchTab(String term) {
+	public void searchTab() {
+		JPanel sTab = new JPanel();
+		sTab.setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Page");
+		lblNewLabel.setBounds(344, 8, 24, 14);
+		
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setBounds(373, 5, 45, 20);
+		comboBox.setPreferredSize(new Dimension(45, 20));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6"}));
+		
+
+		DefaultTableModel model = new DefaultTableModel();
+		model.addColumn("     ");
+		model.addColumn("ISBN13");
+		model.addColumn("Title");
+		model.addColumn("Author");
+		model.addColumn("Year Published");
+		model.addColumn("Type");
+		model.addColumn("Price");
+		
+		
+		JTable table = new JTable();
+		table.setModel(model);
+		
+		
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(10, 33, 742, 418);
+		
+		
+		
+		
+		
+		
+		sTab.add(lblNewLabel);
+		sTab.add(comboBox);
+		sTab.add(scrollPane);
+		tabbedPane.addTab("Search", sTab);
+		
+		JLabel lblSearchResultsFor = new JLabel("Search Results for:");
+		lblSearchResultsFor.setBounds(10, 8, 92, 14);
+		sTab.add(lblSearchResultsFor);
+		
+		JLabel lblTerm = new JLabel("term");
+		lblTerm.setBounds(109, 8, 46, 14);
+		sTab.add(lblTerm);
+	}
+	
+	public void getBook() {
 		
 	}
 	
@@ -184,5 +253,4 @@ public class GUI {
 	public DefaultTableModel getModel() {
 		return tModel;
 	}
-
 }
