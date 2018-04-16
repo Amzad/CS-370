@@ -64,7 +64,8 @@ public class Bookmark extends Thread {
         if (args.length > 0) { 
             new BookmarkCLI(args); // Start the CLI if arguments/flags are present.
         } else {
-            setSystemLook();
+        	System.out.println("PLEASE FOLLOW THE INSTRUCTIONS IN THE TXT FILE");
+            /*setSystemLook();
 
             new Thread() {
                 public void run() {
@@ -75,7 +76,7 @@ public class Bookmark extends Thread {
             }.start();
             //gui = new GUI(); // Start the GUI is no arguments/flags are found.
             db = new Database();
-            //loadCache();
+            //loadCache();*/
 
         }
     }
