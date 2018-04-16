@@ -41,13 +41,25 @@ public class Bookmark extends Thread {
 
     public static void main(String[] args) throws CloneNotSupportedException {
 
-        /*args = new String[2]; // Fake cli args
+       /* args = new String[6]; // Fake cli args
         args[0] = "-i";
-        args[1] = "input.txt";*/
+        args[1] = "https://www.nytimes.com/2018/04/15/us/politics/comey-interview-trump.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=first-column-region&region=top-news&WT.nav=top-news";
+        args[2] = "https://www.yahoo.com/lifestyle/teens-posing-college-acceptance-letters-inspiring-photoshoots-010028656.html";
+        args[3] = "https://www.cnn.com/2018/04/14/us/philadelphia-police-starbucks-arrests/index.html";
+        args[4] = "https://www.facebook.com/";
+        args[5] = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png";
+        args[6] = "http://www.cs.qc.edu/undergrad/BS.pdf";*/
     	
     	/* Order for elements
     	ISBN13, ISBN10, Title, Author, Year, Publisher, Pages, Link
     	*/
+    	//new URLProcessor();
+  
+    	/*args = new String[4];
+    	args[0] = "-i";
+    	args[1] = "links.txt";
+    	args[2] = "-o";
+    	args[3] = "info.txt";*/
 
         if (args.length > 0) { 
             new BookmarkCLI(args); // Start the CLI if arguments/flags are present.

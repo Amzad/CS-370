@@ -4,47 +4,119 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Map.Entry;
+
+import javax.swing.table.DefaultTableModel;
 
 public class BookmarkCLI {
-	Database db; // Create database
+	static Database db; // Create database
 	Scanner input;
 	String inputFile = null; // Stores input file name/location
 	String outputFile = null; // Stores output name/location
-	
-	FileReader loadFile;
-	BufferedReader readFile;
-	FileWriter makeFile;
-	BufferedWriter writeFile;
+
+	static FileReader loadFile;
+	static BufferedReader readFile;
+	static FileWriter makeFile;
+	static BufferedWriter writeFile;
 
 	public BookmarkCLI(String[] args) throws CloneNotSupportedException {
 
+		
+		URLProcessor handler = new URLProcessor();
 
-		db = new Database();
+		for (int i = 0; i < args.length; i++) {
+			if(args[i].startsWith("-i")) {
+				inputFile = args[++i];
+				
+			}
+			
+			if(args[i].startsWith("-o")) {
+				outputFile = args[++i];
+			}
+			
+		}
+		
+		try {
+					makeFile = new FileWriter(outputFile, false);
+					writeFile = new BufferedWriter(makeFile);
+					loadFile = new FileReader(inputFile);
+					readFile = new BufferedReader(loadFile);
+					String inputLine = null;
+					while ((inputLine = readFile.readLine()) != null) {
+						handler.getInfo(inputLine);	
+					}
+					writeFile.close();
+					
+					
+					
+					
+				} catch (FileNotFoundException e) {
+					System.out.println("File not found");
+					e.printStackTrace();
+				} catch (IOException e) {
+					System.out.println("Error accessing file");
+					e.printStackTrace();
+				}
 
+		//db = new Database();
+		//loadCache();
+
+		/*
 		for (int i = 0; i < args.length; i++) { // A loop to cycle through the flags/parameters.
+			if (args[i].startsWith("-i")) { // Flag for input
+				int index = i;
+				index++;
 
-			if (args[i].startsWith("-i")) {  // Flag for input
-				inputFile = args[++i]; // The name/filepath of the input file.
+				while (!(args[index].startsWith("-")) | !(index <= args.length)) {
+
+					// If the argument is a URL, process it
+					if (args[index].startsWith("http") | (args[index].startsWith("www"))) {
+						try {
+							URL tempURL;
+							tempURL = new URL(args[index]);
+							new URLProcessor(tempURL);
+
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						}
+						index++;
+						i++;
+						if (index == args.length | i == args.length)
+							break;
+					} else { // If the argument is a file
+						inputFile = args[index]; // The name/filepath of the input file.
+						if (inputFile.length() > 0) {
+							System.out.println(inputFile);
+							readFile(inputFile);
+							index++;
+							i++;
+							if (index == args.length | i == args.length)
+								break;
+							
+						}
+
+					}
+
+					if (args[i].startsWith("-o")) { // Flag for output
+						outputFile = args[i++]; // The name/filepath of the output file.
+					}
+				}
 			}
+		}*/
 
-			if (args[i].startsWith("-o")) {  // Flag for output
-				outputFile = args[i++]; // The name/filepath of the output file.
-			}
-
-		}
-
-		System.out.println("Creating database");
+		
+		//System.out.println("Creating database");
 		// Create a new HashMap database with the contents of the input file.
-		if (inputFile.length() > 0 ) {
-			readFile(inputFile);
-		}
+		
 
-		System.out.println("Welcome to Bookmark! Press H for a list of available options.");
-		while (true) {
+		//System.out.println("Welcome to Bookmark! Press H for a list of available options.");
+		/*while (true) {
 			System.out.println("Enter a command");
 			input = new Scanner(System.in); // Start scanner
 			String command = input.next(); // Get command
@@ -146,53 +218,75 @@ public class BookmarkCLI {
 			}
 
 
-		}	
-	}
-	
-	public void readFile(String file) {
-		String name;
-		String isbn;
+		}*/
 		
-		//File inputFile = new File(file);
+	}
+	/*
+	public void readFile(String file) {
+		String isbn13, isbn10, title, author, year, publisher, link, pages;;
+
+		// File inputFile = new File(file);
 		try {
 			loadFile = new FileReader(file); // Load file into the FileReader
 			readFile = new BufferedReader(loadFile); // Read file into BufferedReader
 			System.out.println("File Found");
-			
+
 			String inputLine; // The current line being read.
 			String delimiter = "[|]"; // Book titles rarely have separators.
-			
+
 			// If the line isn't empty, process the data.
 			while ((inputLine = readFile.readLine()) != null) {
 				String[] info = inputLine.split(delimiter);
-				isbn = info[0].trim(); // Remove starting and trailing white spaces.
-				name = info[1].trim(); // Remove starting and trailing white spaces.
+				isbn13 = info[0].trim();
+                isbn10 = info[1].trim(); // Remove starting and trailing white spaces.
+                title = info[2].trim(); // Remove starting and trailing white spaces.
+                author = info[3].trim();
+                year = info[4].trim();
+                publisher = info[5].trim();
+                link = info[6].trim();
+                pages = info[7].trim();
+
+				// Create a new Book object with the name and isbn10 number
+				Book tempBook = new Book(isbn13, isbn10, title, author, year, publisher, link, pages); 
 				
-				Book tempBook = new Book(name, isbn); // Create a new Book object with the name and isbn10 number
-				db.add(tempBook); // Add the new Book object to the database.
-				System.out.println(tempBook.getTitle() + " added to the database");
+
+				// Book newBook = new Book(isbn, name, author, year); // Create a new Book
+				// object with the name and isbn10 number
+				
+
+				if (bookExists(tempBook)) {
+					System.out.println("Existing Book found. Skipping book");
+				} else {
+					String[] data = { tempBook.getISBN13(), tempBook.getTitle(), tempBook.getAuthor() };
+					db.add(tempBook); // Add the new Book object to the database.
+					System.out.println(tempBook.getTitle() + " added to the database");
+				}
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found");
-			//e.printStackTrace();
+			// e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("Unable to access file");
-			//e.printStackTrace();
-		}
-		finally {
+			// e.printStackTrace();
+		} finally {
 			try {
 				readFile.close();
 				loadFile.close();
+				saveCurrentState();
+				System.out.println("Database Updated");
 			} catch (IOException e) {
 				System.out.println("Unable to close file");
-				//e.printStackTrace();
+				// e.printStackTrace();
+			} catch (NullPointerException e) {
+				// Unable to close file that was never found
 			}
+
 		}
-		System.out.println("Database creation completed");
+		
 	} // END:readFile
-	
-	public void writeFile(String outputFile) {
+
+	public static void writeFile(String outputFile) {
 		try {
 			makeFile = new FileWriter(outputFile);
 			writeFile = new BufferedWriter(makeFile);
@@ -200,16 +294,15 @@ public class BookmarkCLI {
 			Iterator it = hmap.entrySet().iterator();
 			while (it.hasNext()) {
 
-				Map.Entry pair = (Map.Entry)it.next();
+				Map.Entry pair = (Map.Entry) it.next();
 				Book temp = (Book) pair.getValue();
-				
+
 				writeFile.write(temp.getISBN10() + "|" + temp.getTitle());
 				writeFile.newLine();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			try {
 				writeFile.close();
 				makeFile.close();
@@ -218,7 +311,117 @@ public class BookmarkCLI {
 				e.printStackTrace();
 			}
 		}
-		
+
 	} // END: writeFile
+	
+	public static void loadCache() {
+
+        String file = "database.txt";
+        try {
+
+            String isbn13, isbn10, title, author, year, publisher, link, pages;
+
+            loadFile = new FileReader(file); // Load file into the FileReader
+            readFile = new BufferedReader(loadFile); // Read file into BufferedReader
+            System.out.println("Cache Found. Loading Cache");
+
+            String inputLine; // The current line being read.
+            String delimiter = "[|]"; // Book titles rarely have separators.
+
+            // If the line isn't empty, process the data.
+            
+            while ((inputLine = readFile.readLine()) != null) {
+                String[] info = inputLine.split(delimiter);
+                isbn13 = info[0].trim();
+                isbn10 = info[1].trim(); // Remove starting and trailing white spaces.
+                title = info[2].trim(); // Remove starting and trailing white spaces.
+                author = info[3].trim();
+                year = info[4].trim();
+                publisher = info[5].trim();
+                link = info[6].trim();
+                pages = info[7].trim();
+
+                Book tempBook = new Book(isbn13, isbn10, title, author, year, publisher, link, pages); // Create a new Book object with the name and isbn10 number
+                db.add(tempBook); // Add the new Book object to the database.
+                //String[] data = {tempBook.getISBN13(), tempBook.getISBN10(), tempBook.getTitle(), tempBook.getAuthor(), tempBook.getYear(), tempBook.getPublisher(), tempBook.getLink(), tempBook.getPages()};
+                String[] data = {tempBook.getISBN13(), tempBook.getTitle(), tempBook.getAuthor()};
+                
+                //gui.addRow(data);
+            }
+            System.out.println("Cache loaded");
+
+
+        } catch (FileNotFoundException e) {
+        	System.out.println("Cache not found.");
+        } catch (IOException e) {
+        	System.out.println("Unable to read or write to file.");
+        }
+
+        finally {
+            try {
+                readFile.close();
+                loadFile.close();
+            } catch (IOException e) {
+            	System.out.println("Unable to close files.");
+            } catch (NullPointerException e) {
+            	System.out.println("Unable to find cache");
+            }
+
+        }
+    }
+	
+	public static boolean bookExists(Book checkBook) {
+    	boolean exists = false;
+    	if (db.ifExists(checkBook.getISBN13())) {
+    		exists = true;
+    	}
+    	return exists;
+    }
+	
+	 public static void saveCurrentState() {
+	        System.out.println("Starting state save.");
+
+	        try {
+	        	//File check = new File()
+	            makeFile = new FileWriter("database.txt", false);
+	            writeFile = new BufferedWriter(makeFile);
+
+
+	            HashMap<String, Book> hmap = db.getDatabase();
+
+	            Iterator<Entry<String, Book>> it = hmap.entrySet().iterator();
+	            while (it.hasNext()) {
+	                Map.Entry pair = (Map.Entry)it.next();
+	                Book temp = (Book) pair.getValue();
+	                //gui.print(temp.getTitle());
+	                writeFile.write(temp.getISBN13() + "|" + 
+	                        temp.getISBN10() + "|" +
+	                        temp.getTitle() + "|" +
+	                        temp.getAuthor() + "|" +
+	                        temp.getYear() + "|" +
+	                        temp.getPublisher() + "|" +
+	                        temp.getLink() + "|" +
+	                        temp.getPages()
+	                        );
+	                writeFile.newLine();
+	                
+	            }
+
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	        finally {
+	            try {
+	                writeFile.close();
+	                makeFile.close();
+	                System.out.println("Current state saved");
+	            } catch (IOException e) {
+	            	 System.out.println("Unable to access file");
+	                System.out.println(e);
+	            }
+
+
+	        }
+	    }*/
 
 }

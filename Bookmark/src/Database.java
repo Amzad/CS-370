@@ -113,8 +113,8 @@ public class Database {
 	}
 	
 	/**
-	 * Check of the ISBN10 is in the database
-	 * @param isbn The ISBN10 number to check
+	 * Check of the ISBN13 is in the database
+	 * @param isbn The ISBN13 number to check
 	 * @return Returns true if it exists
 	 */
 	public boolean ifExists(String isbn) {
@@ -124,7 +124,7 @@ public class Database {
 			Map.Entry pair = (Map.Entry)it.next();
 			Book temp = (Book) pair.getValue();
 			
-			if (temp.getISBN10().equals(isbn)) {
+			if (temp.getISBN13().equals(isbn)) {
 				return true;
 			}
 		}
