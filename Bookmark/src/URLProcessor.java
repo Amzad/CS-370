@@ -11,12 +11,11 @@ public class URLProcessor {
 	
 	
 	public URLProcessor() {
-		
+
 	}
 	
 	public void displayURLInfo(String url) {
-		
-		
+			
 	}
 	
 	private URL generateURL(String searchTerm) {
@@ -37,47 +36,106 @@ public class URLProcessor {
 			
 			e.printStackTrace();
 		}
-		
 		return url;
 	}
 	
-	public ArrayList findBook(String searchTerm) {
+	public ArrayList<Book> findBook(String searchTerm) {
 		
-		ArrayList bookList = new ArrayList();
+		ArrayList<Book> bookList = new ArrayList<Book>();
 
 		URL url = generateURL(searchTerm);
 
 		InputStream content = (InputStream) getURLInputStream(url);
 		BufferedReader bReader = new BufferedReader (new InputStreamReader(content));
 		
+		String resultCount;
 		String image;
-		String isbn13;
-		//String isbn10;
-		String bookName;
-		String bookAuthor;
-		String bookPublished;
+		String isbn13 = null;
+		String isbn10 = null;
+		String bookName = null;
+		String bookAuthor = null;
+		String bookPublished = null;
 		double price;
 		String type;
+		String imgLink;
+		
+		String searchSection = "<div class=\"tab search\">";
+		String dimage = "<img class=\"lazy\" data-lazy=";
+		String resultNum = "of  <span class=\"search-count\"";
+		String title = "<meta itemprop=\"name\" content=";				
+		String dauthor = "<span itemprop=\"author\"";
+		String dpublished = "<p class='published' itemprop=\"datePublished\">";
+		String dformat = "<p class=\"format\">";
+		String disbn13 = "<meta itemprop=\"isbn\" content=\"";
+		String dtype = "<p class='published'";
 		
 		try {
 			String line = bReader.readLine();
-			String searchSection = "<div class=\"tab search\">";
-			String dimage = "  <img class=\"lazy\" data-lazy=";
-			String resultNum = "";
-			String dauthor = "<p class=\"author\">";
-			String dpublished = "<p class='published' itemprop=\"datePublished\">";
-			String dformat = "<p class=\"format\">";
-			
-			
-			int resultCount = 0;
-			
-			
+				
+
 			while (line != null) {
-				if (line.startsWith(searchSection)) {
-					
-					
+				// System.out.println(line);
+				if (line.trim().startsWith(resultNum)) { // Find the results section.
+					resultCount = line.substring(line.indexOf(">") + 1, line.indexOf(">") + 2); // Gets the result number
+					System.out.println(resultCount);
+					int count = 0;
+
+					while (count < Integer.parseInt(resultCount)) {
+						if (line.trim().startsWith(dimage)) {
+							if (line.contains(".jpg")) {
+								imgLink = line.substring(line.indexOf(dimage) + 29, line.indexOf(".jpg") + 4);
+								System.out.println(imgLink);
+							} else if (line.contains(".jpeg")) {
+								imgLink = line.substring(line.indexOf(dimage) + 29, line.indexOf(".jpeg") + 5);
+								System.out.println(imgLink);
+							} else if (line.contains(".png")) {
+								imgLink = line.substring(line.indexOf(dimage) + 29, line.indexOf(".png") + 4);
+								System.out.println(imgLink);
+							}
+
+						}
+
+						if (line.trim().startsWith(disbn13)) {
+							isbn13 = line.substring(line.indexOf(disbn13) + 31, line.lastIndexOf("\""));
+							System.out.println(isbn13);
+						}
+
+						if (line.trim().startsWith(title)) {
+							bookName = line.substring(line.indexOf(title) + 31, line.lastIndexOf("\""));
+							System.out.println(bookName);
+						}
+
+						if (line.trim().startsWith(dauthor)) {
+							bookAuthor = line.substring(line.indexOf("itemscope=\"") + 11, line.lastIndexOf("\""));
+							System.out.println(bookAuthor);
+						}
+
+						if (line.trim().startsWith(dpublished)) {
+							line = bReader.readLine();
+							line = line.trim();
+							bookPublished = line.substring(0, line.lastIndexOf("<"));
+							bookPublished = bookPublished.split(" ")[2];
+							System.out.println(bookPublished);
+						}
+
+						if (line.trim().startsWith(dformat)) {
+							line = bReader.readLine();
+							line = line.trim();
+							type = line.substring(0, line.lastIndexOf("<"));
+							System.out.println(type + "\n");							
+							Book searchBook = new Book(isbn13, isbn10, bookName, bookAuthor, bookPublished, null, type, null);	
+							bookList.add(searchBook);
+							count++;
+						}
+						
+						line = bReader.readLine();  // Goto next line
+
+					}
 				}
 				
+				
+				
+				line = bReader.readLine();  // Goto next line
 			}
 			
 			

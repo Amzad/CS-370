@@ -13,6 +13,8 @@ public class Book implements Cloneable {
 	protected String publisher = null; // Publisher of the book
 	protected String link = null;
 	protected String pages;
+	protected String type = null;
+	protected double price;
 	
 	/**
 	 * One of the constructors that allows you to create a book object with the title of the book.
@@ -44,6 +46,18 @@ public class Book implements Cloneable {
     }
 	
 	public Book(String ISBN13, String ISBN10, String title, String author, String year, String publisher, String link, String pages) {
+		setISBN13(ISBN13);
+		setISBN10(ISBN10);
+		setTitle(title);
+		setAuthor(author);
+		setYear(year);
+		setPublisher(publisher);
+		setLink(link);
+		setPages(pages);
+		
+	}
+	
+	public Book(String ISBN13, String ISBN10, String title, String author, String year, String publisher, String link, String pages, String type, String price) {
 		setISBN13(ISBN13);
 		setISBN10(ISBN10);
 		setTitle(title);
@@ -157,6 +171,24 @@ public class Book implements Cloneable {
 	public String setPages(String newPages) {
 		pages = newPages;
 		return pages;
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
+	public String setType(String newType) {
+		type = newType;
+		return type;
+	}
+	
+	public double getPrice() {
+		return price;
+	}
+	
+	public double setPrice(double newPrice) {
+		price = newPrice;
+		return price;
 	}
 	
 	

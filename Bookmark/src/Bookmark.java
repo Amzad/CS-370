@@ -34,6 +34,7 @@ public class Bookmark extends Thread {
     static GUI gui;
     static MYSql netdb;
     static Database db;
+    static URLProcessor urlP;
     static FileReader loadFile;
     static BufferedReader readFile;
     static FileWriter makeFile;
@@ -56,11 +57,13 @@ public class Bookmark extends Thread {
 
             new Thread() {
                 public void run() {
-                    gui = new GUI();
+                    gui = new GUI(); 
                     loadCache();
                     netdb = new MYSql();
+                    urlP = new URLProcessor();
                 }
             }.start();
+            
             //gui = new GUI(); // Start the GUI is no arguments/flags are found.
             db = new Database();
             //loadCache();

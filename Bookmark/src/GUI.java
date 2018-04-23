@@ -15,6 +15,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JScrollPane;
 import javax.swing.DropMode;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -41,6 +42,7 @@ public class GUI {
 	private JTextField textFieldSearch;
 	JTextArea textAreaSystemLog;
 	DefaultTableModel tModel;
+	DefaultTableModel sModel;
 	JTabbedPane tabbedPane;
 	
 	public GUI() {
@@ -103,7 +105,16 @@ public class GUI {
 		panel.add(lblSearch);
 		textFieldSearch = new JTextField();
 		panel.add(textFieldSearch);
+		
 		textFieldSearch.setColumns(50);
+		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addSearchRow(Bookmark.urlP.findBook(textFieldSearch.getText()));
+
+			}
+		});
+		jFrame.add(btnSearch);
 		
 		// TabbedPane START
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
@@ -152,6 +163,7 @@ public class GUI {
 				textAreaSystemLog.setText("");
 			}
 		});
+
 		jFrame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		
 		jFrame.setVisible(true);
@@ -205,18 +217,18 @@ public class GUI {
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6"}));
 		
 
-		DefaultTableModel model = new DefaultTableModel();
-		model.addColumn("     ");
-		model.addColumn("ISBN13");
-		model.addColumn("Title");
-		model.addColumn("Author");
-		model.addColumn("Year Published");
-		model.addColumn("Type");
-		model.addColumn("Price");
+	    sModel = new DefaultTableModel();
+		//sModel.addColumn("     ");
+		sModel.addColumn("ISBN13");
+		sModel.addColumn("Title");
+		sModel.addColumn("Author");
+		sModel.addColumn("Year Published");
+		sModel.addColumn("Type");
+		//sModel.addColumn("Price");
 		
 		
 		JTable table = new JTable();
-		table.setModel(model);
+		table.setModel(sModel);
 		
 		
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -248,6 +260,17 @@ public class GUI {
 	public void addRow(String[] data) {
 	    tModel.addRow(data);
 	    
+	}
+	
+	public void addSearchRow(ArrayList<Book> data) {
+		
+		for(int i = 0; i < data.size(); i++) {
+			Book temp = data.get(i);
+			String[] tempS = {temp.getISBN13(), temp.getTitle(), temp.getAuthor(), temp.getYear(), temp.getPublisher(), temp.getType()};
+			sModel.addRow(tempS);
+			
+		}
+		
 	}
 	
 	public DefaultTableModel getModel() {
