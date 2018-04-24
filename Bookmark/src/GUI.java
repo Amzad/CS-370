@@ -44,10 +44,12 @@ public class GUI {
 	DefaultTableModel tModel;
 	DefaultTableModel sModel;
 	JTabbedPane tabbedPane;
+	JLabel lblResults;
+	JComboBox comboBox;
 	
 	public GUI() {
 		jFrame.setResizable(false);
-		jFrame.setSize(900, 600);
+		jFrame.setSize(900, 700);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.getContentPane().setLayout(new FlowLayout());
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -114,7 +116,7 @@ public class GUI {
 
 			}
 		});
-		jFrame.add(btnSearch);
+		jFrame.getContentPane().add(btnSearch);
 		
 		// TabbedPane START
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
@@ -125,7 +127,7 @@ public class GUI {
 		
 		tModel = new DefaultTableModel();
 		JTable bookTable = new JTable();
-		bookTable.setPreferredScrollableViewportSize(new Dimension(750, 450));
+		bookTable.setPreferredScrollableViewportSize(new Dimension(750, 550));
 		JScrollPane scrollPaneTable = new JScrollPane(bookTable);
 		//homePanel.setSize(900, 500);
 		
@@ -171,7 +173,6 @@ public class GUI {
 		enableAdmin(true);
 		searchTab();
 		
-		
 	}
 	
 	public void enableAdmin(boolean value) {
@@ -211,7 +212,7 @@ public class GUI {
 		lblNewLabel.setBounds(344, 8, 24, 14);
 		
 		
-		JComboBox comboBox = new JComboBox();
+		comboBox = new JComboBox();
 		comboBox.setBounds(373, 5, 45, 20);
 		comboBox.setPreferredSize(new Dimension(45, 20));
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6"}));
@@ -232,7 +233,7 @@ public class GUI {
 		
 		
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(10, 33, 742, 418);
+		scrollPane.setBounds(10, 33, 742, 510);
 		
 		
 		
@@ -251,10 +252,28 @@ public class GUI {
 		JLabel lblTerm = new JLabel("term");
 		lblTerm.setBounds(109, 8, 46, 14);
 		sTab.add(lblTerm);
+		
+		lblResults = new JLabel("Results: 0");
+		lblResults.setBounds(695, 8, 57, 14);
+		sTab.add(lblResults);
 	}
 	
 	public void getBook() {
 		
+	}
+	
+	public void setPageCount(int count) {
+		int pageNum = (count/30) + 1;
+		String[] pageCount = new String[pageNum];
+		for (int i = 0; i < pageNum; i++) {
+			pageCount[i] = Integer.toString(i);
+		}
+		comboBox.setModel(new DefaultComboBoxModel(pageCount));
+		
+	}
+	
+	public void setResultsCount (int count) {
+		lblResults.setText(Integer.toString(count));
 	}
 	
 	public void addRow(String[] data) {
@@ -276,4 +295,5 @@ public class GUI {
 	public DefaultTableModel getModel() {
 		return tModel;
 	}
+	
 }

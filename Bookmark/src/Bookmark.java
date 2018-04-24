@@ -58,8 +58,8 @@ public class Bookmark extends Thread {
             new Thread() {
                 public void run() {
                     gui = new GUI(); 
-                    loadCache();
-                    netdb = new MYSql();
+                   // loadCache();
+                   // netdb = new MYSql();
                     urlP = new URLProcessor();
                 }
             }.start();
