@@ -83,13 +83,18 @@ public class Book implements Cloneable {
 	    int sum = 0;
 	    
 	    for (int i = 0; i < ISBN13.length(); i++) {
-	        checkDigit = ((i % 2 == 0) ? 1 : 3);
+	       // checkDigit = ((i % 2 == 0) ? 1 : 3);
+	        if (i % 2 == 0) {
+	        	checkDigit = 1;
+	        }
+	        else {
+	        	checkDigit = 3;
+	        }
 	        sum += ((((int) ISBN13.charAt(i)) - 48) * checkDigit);
 	    }
 	    
 	    sum = 10 - (sum % 10);
-	    ISBN13 += sum;
-
+	    ISBN13 = ISBN13 + sum;
 	    return ISBN13;
 			
 	}

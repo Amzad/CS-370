@@ -39,17 +39,18 @@ import javax.swing.DefaultComboBoxModel;
 
 public class GUI {
 	JFrame jFrame = new JFrame("Bookmark");
-	private JTextField textFieldSearch;
 	JTextArea textAreaSystemLog;
 	DefaultTableModel tModel;
 	DefaultTableModel sModel;
 	JTabbedPane tabbedPane;
 	JLabel lblResults;
 	JComboBox comboBox;
+	JLabel lblTerm;
+	private JTextField textFieldSearch;
 	
 	public GUI() {
 		jFrame.setResizable(false);
-		jFrame.setSize(900, 700);
+		jFrame.setSize(900, 725);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.getContentPane().setLayout(new FlowLayout());
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -101,22 +102,7 @@ public class GUI {
 		
 		
 		// Search Bar Panel
-		JPanel panel = new JPanel();
-		jFrame.getContentPane().add(panel);
-		JLabel lblSearch = new JLabel("Search ");
-		panel.add(lblSearch);
-		textFieldSearch = new JTextField();
-		panel.add(textFieldSearch);
-		
-		textFieldSearch.setColumns(50);
-		JButton btnSearch = new JButton("Search");
-		btnSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				addSearchRow(Bookmark.urlP.findBook(textFieldSearch.getText()));
-
-			}
-		});
-		jFrame.getContentPane().add(btnSearch);
+	
 		
 		// TabbedPane START
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
@@ -127,7 +113,7 @@ public class GUI {
 		
 		tModel = new DefaultTableModel();
 		JTable bookTable = new JTable();
-		bookTable.setPreferredScrollableViewportSize(new Dimension(750, 550));
+		bookTable.setPreferredScrollableViewportSize(new Dimension(750, 575));
 		JScrollPane scrollPaneTable = new JScrollPane(bookTable);
 		//homePanel.setSize(900, 500);
 		
@@ -142,6 +128,8 @@ public class GUI {
 		//tModel.addColumn("ISBN10");
 		tModel.addColumn("Title");
 		tModel.addColumn("Author");
+		tModel.addColumn("Page");
+		
 		
 		//tModel.addColumn("Year");
 		//tModel.addColumn("Publisher");
@@ -208,23 +196,60 @@ public class GUI {
 		JPanel sTab = new JPanel();
 		sTab.setLayout(null);
 		
+		//Search Fields
+		JPanel panel = new JPanel();
+		sTab.add(panel);
+		
+		JButton btnSearch = new JButton("Search");
+		btnSearch.setBounds(578, 7, 65, 23);
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addSearchRow(Bookmark.urlP.findBook(textFieldSearch.getText()));
+
+			}
+		});
+		sTab.add(btnSearch);
+		
+		textFieldSearch = new JTextField();
+		textFieldSearch.setColumns(50);
+		textFieldSearch.setBounds(162, 8, 406, 20);
+		sTab.add(textFieldSearch);
+		
+		JLabel label = new JLabel("Search ");
+		label.setBounds(122, 11, 36, 14);
+		sTab.add(label);
+
 		JLabel lblNewLabel = new JLabel("Page");
-		lblNewLabel.setBounds(344, 8, 24, 14);
+		lblNewLabel.setBounds(340, 38, 24, 14);
 		
 		
 		comboBox = new JComboBox();
-		comboBox.setBounds(373, 5, 45, 20);
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int page = comboBox.getSelectedIndex() + 1;
+				System.out.println(page);
+				String term = lblTerm.getText();
+				clearTable();
+				addSearchRow(Bookmark.urlP.changePage(page, term));
+			}
+		});
+		comboBox.setBounds(372, 35, 45, 20);
 		comboBox.setPreferredSize(new Dimension(45, 20));
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5", "6"}));
 		
 
-	    sModel = new DefaultTableModel();
+	    sModel = new DefaultTableModel() {
+	    	@Override
+	    	   public boolean isCellEditable(int row, int column) {       
+	    	       return false; // or a condition at your choice with row and column
+	    	   }
+	    };
 		//sModel.addColumn("     ");
 		sModel.addColumn("ISBN13");
 		sModel.addColumn("Title");
 		sModel.addColumn("Author");
 		sModel.addColumn("Year Published");
 		sModel.addColumn("Type");
+		
 		//sModel.addColumn("Price");
 		
 		
@@ -233,10 +258,7 @@ public class GUI {
 		
 		
 		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(10, 33, 742, 510);
-		
-		
-		
+		scrollPane.setBounds(10, 66, 742, 510);
 		
 		
 		
@@ -246,34 +268,69 @@ public class GUI {
 		tabbedPane.addTab("Search", sTab);
 		
 		JLabel lblSearchResultsFor = new JLabel("Search Results for:");
-		lblSearchResultsFor.setBounds(10, 8, 92, 14);
+		lblSearchResultsFor.setBounds(10, 38, 92, 14);
 		sTab.add(lblSearchResultsFor);
 		
-		JLabel lblTerm = new JLabel("term");
-		lblTerm.setBounds(109, 8, 46, 14);
+	
+		JButton btnNext = new JButton("Next");
+		btnNext.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (comboBox.getSelectedIndex() +1 != 333) {
+					comboBox.setSelectedIndex(comboBox.getSelectedIndex() + 1);
+				}
+			}
+		});
+		btnNext.setBounds(427, 34, 55, 23);
+		sTab.add(btnNext);
+		
+		JButton btnPrev = new JButton("Prev.");
+		btnPrev.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if ((comboBox.getSelectedIndex() - 1 != 333) && (comboBox.getSelectedIndex() != 0)) {
+					comboBox.setSelectedIndex(comboBox.getSelectedIndex() - 1);
+				}
+			}
+		});
+		btnPrev.setBounds(265, 34, 65, 23);
+		sTab.add(btnPrev);
+		lblTerm = new JLabel("");
+		lblTerm.setBounds(112, 38, 46, 14);
 		sTab.add(lblTerm);
 		
-		lblResults = new JLabel("Results: 0");
-		lblResults.setBounds(695, 8, 57, 14);
+		lblResults = new JLabel("Results: ");
+		lblResults.setBounds(642, 41, 110, 14);
 		sTab.add(lblResults);
+		
+		
+		
+		
+		
+		
+		sTab.add(label);
 	}
 	
-	public void getBook() {
-		
+	public void setTerm() {
+		lblTerm.setText(textFieldSearch.getText());
 	}
 	
 	public void setPageCount(int count) {
-		int pageNum = (count/30) + 1;
+		System.out.println(count);
+		int pageNum = (count/30);
+		
 		String[] pageCount = new String[pageNum];
 		for (int i = 0; i < pageNum; i++) {
-			pageCount[i] = Integer.toString(i);
+			pageCount[i] = Integer.toString(i+1);
 		}
 		comboBox.setModel(new DefaultComboBoxModel(pageCount));
 		
 	}
 	
 	public void setResultsCount (int count) {
-		lblResults.setText(Integer.toString(count));
+		lblResults.setText("Results: " + Integer.toString(count));
+	}
+	
+	public void setTotalCount (int count) {
+		lblResults.setText("Results: " + Integer.toString(count));
 	}
 	
 	public void addRow(String[] data) {
@@ -283,6 +340,8 @@ public class GUI {
 	
 	public void addSearchRow(ArrayList<Book> data) {
 		
+		clearTable();
+		setTerm();
 		for(int i = 0; i < data.size(); i++) {
 			Book temp = data.get(i);
 			String[] tempS = {temp.getISBN13(), temp.getTitle(), temp.getAuthor(), temp.getYear(), temp.getPublisher(), temp.getType()};
@@ -292,8 +351,13 @@ public class GUI {
 		
 	}
 	
+	public void clearTable() {
+		while (sModel.getRowCount() != 0) {
+			sModel.removeRow(0);
+		}
+	}
+	
 	public DefaultTableModel getModel() {
 		return tModel;
 	}
-	
 }
