@@ -5,17 +5,23 @@
  *
  */
 public class Book implements Cloneable {
-	protected String ISBN13;    // ISBN10 number of the book
+	protected String ISBN13 = null;    // ISBN10 number of the book
 	protected String ISBN10 = null;    // ISBN13 number of the book
-	protected String title; 		   // Name of the book
+	protected String title = null;		   // Name of the book
 	protected String author = null;    // Author of the book
 	protected String year = null;	   // Year the book was published
 	protected String publisher = null; // Publisher of the book
 	protected String link = null;
-	protected String pages;
+	protected String pages = null;
 	protected String type = null;
-	protected double price;
+	protected String imgLink = null;
+	protected double price = 0.0d;
+	protected String location = "None";
 	
+	
+	public Book() {
+		
+	}
 	/**
 	 * One of the constructors that allows you to create a book object with the title of the book.
 	 * @param newISBN10 ISBN10 number of the book
@@ -37,37 +43,7 @@ public class Book implements Cloneable {
 		setTitle(title);
         setISBN13(ISBN13);
 	}
-	
-	public Book(String ISBN13, String title, String author, String year) {
-        setTitle(title);
-        setISBN13(ISBN13);
-        setAuthor(author);
-        setYear(year);
-    }
-	
-	public Book(String ISBN13, String ISBN10, String title, String author, String year, String publisher, String link, String pages) {
-		setISBN13(ISBN13);
-		setISBN10(ISBN10);
-		setTitle(title);
-		setAuthor(author);
-		setYear(year);
-		setPublisher(publisher);
-		setLink(link);
-		setPages(pages);
-		
-	}
-	
-	public Book(String ISBN13, String ISBN10, String title, String author, String year, String publisher, String link, String pages, String type, String price) {
-		setISBN13(ISBN13);
-		setISBN10(ISBN10);
-		setTitle(title);
-		setAuthor(author);
-		setYear(year);
-		setPublisher(publisher);
-		setLink(link);
-		setPages(pages);
-		
-	}
+
 	
 	/* WikiPedia: 
 	 * Remove ISBN10 check digit. 
@@ -165,7 +141,7 @@ public class Book implements Cloneable {
 	}
 	
 	public String setLink(String newLink) {
-		publisher = newLink;
+		link = newLink;
 		return link;
 	}
 	
@@ -194,6 +170,24 @@ public class Book implements Cloneable {
 	public double setPrice(double newPrice) {
 		price = newPrice;
 		return price;
+	}
+	
+	public String getImage() {
+		return imgLink;
+	}
+	
+	public String setImage(String link) {
+		imgLink = link;
+		return imgLink;
+	}
+	
+	public String getLocation() {
+		return location;
+	}
+	
+	public String setLocation(String location) {
+		this.location = location;
+		return location;
 	}
 	
 	

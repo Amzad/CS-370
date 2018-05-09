@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -15,6 +16,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JScrollPane;
 import javax.swing.DropMode;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.BoxLayout;
@@ -36,6 +38,11 @@ import java.awt.Insets;
 import javax.swing.JSeparator;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JProgressBar;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class GUI {
 	JFrame jFrame = new JFrame("Bookmark");
@@ -43,26 +50,36 @@ public class GUI {
 	DefaultTableModel tModel;
 	DefaultTableModel sModel;
 	JTabbedPane tabbedPane;
+	JTable table;
 	JLabel lblResults;
 	JComboBox comboBox;
 	JLabel lblTerm;
 	private JTextField textFieldSearch;
+	JProgressBar progressBar;
+	JButton btnNext;
+	JButton btnPrev;
+	JButton btnSearch;
+	ArrayList<Book> data;
+	ArrayList<Book> library = new ArrayList();
+	Modify modify;
 	
-	public GUI() {
+	public GUI(int value) {
+		
+		// Main frame <Open>
 		jFrame.setResizable(false);
 		jFrame.setSize(900, 725);
 		jFrame.setLocationRelativeTo(null);
-		jFrame.getContentPane().setLayout(new FlowLayout());
+		jFrame.getContentPane().setLayout(null);
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
 
-		// ALL THE MENU ITEMS
+		// Menu Items <Open>
 		JMenuBar menuBar = new JMenuBar();
 		jFrame.setJMenuBar(menuBar);
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 
-		JMenuItem mntmImport = new JMenuItem("Import");
+		JMenuItem mntmImport = new JMenuItem("Import"); // File Import Option
 		mntmImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Bookmark.importFile();
@@ -70,7 +87,7 @@ public class GUI {
 		});
 		mnFile.add(mntmImport);
 
-		JMenuItem mntmExport = new JMenuItem("Export");
+		JMenuItem mntmExport = new JMenuItem("Export"); // File Export Option
 		mntmExport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Bookmark.exportFile();
@@ -78,49 +95,77 @@ public class GUI {
 		});
 		mnFile.add(mntmExport);
 
-		JMenuItem mntmExit = new JMenuItem("Exit");
+		JMenuItem mntmExit = new JMenuItem("Exit"); // Exit Program
 		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
 		
-		JMenuItem mntmGenerateReport = new JMenuItem("Generate Report");
+		JMenuItem mntmGenerateReport = new JMenuItem("Generate Report");  // Generate Report
 		mnFile.add(mntmGenerateReport);
 		
 		JSeparator separator = new JSeparator();
 		mnFile.add(separator);
 		mnFile.add(mntmExit);
 
-		JMenu mnNewMenu = new JMenu("Edit");
-		menuBar.add(mnNewMenu);
+		//JMenu mnNewMenu = new JMenu("Edit"); 
+		//menuBar.add(mnNewMenu);
 
 		JMenu mnAbout = new JMenu("About");
+		mnAbout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				JOptionPane.showMessageDialog(null, "This program was created by \n Amzad Chowdhury \n for CS370 at Queens College.");
+				Bookmark.saveCurrentState();
+			}
+		});
 		menuBar.add(mnAbout);
 		
-		// END MENU 
+		// Menu Items <Closed>
+
 		
-		
-		// Search Bar Panel
-	
-		
-		// TabbedPane START
+		// TabbedPane <Open>
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-		// Home Tab
+		tabbedPane.setBounds(30, 5, 833, 592);
+		
+		
+		// Home Tab <Open>
 		JPanel homePanel = new JPanel();
-		tabbedPane.add("My Library", homePanel);
-		
-		
-		tModel = new DefaultTableModel();
+		//tabbedPane.add("My Library", homePanel);
+		tModel = new DefaultTableModel() {
+	    	@Override
+	    	   public boolean isCellEditable(int row, int column) {       
+	    	       return false; // or a condition at your choice with row and column
+	    	   }
+	    };
 		JTable bookTable = new JTable();
+		
 		bookTable.setPreferredScrollableViewportSize(new Dimension(750, 575));
-		JScrollPane scrollPaneTable = new JScrollPane(bookTable);
-		//homePanel.setSize(900, 500);
-		
-		
 		bookTable.setModel(tModel);
 		bookTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		bookTable.setFillsViewportHeight(true);
+		
+		bookTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				if(arg0.getClickCount() == 2 ) {
+					Book temp = null;
+					if (bookTable.getSelectedRow() >= 0) {
+						for (int i = 0; i < library.size(); i++) {
+							Object number = bookTable.getModel().getValueAt(bookTable.getSelectedRow(), 0);
+							if (number == library.get(i).getISBN13()) {
+								temp = library.get(i);
+								editBook(temp);
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+		
+		JScrollPane scrollPaneTable = new JScrollPane(bookTable);
 		
 		
 		// Add the columns
@@ -129,6 +174,7 @@ public class GUI {
 		tModel.addColumn("Title");
 		tModel.addColumn("Author");
 		tModel.addColumn("Page");
+		tModel.addColumn("Location");
 		
 		
 		//tModel.addColumn("Year");
@@ -139,12 +185,14 @@ public class GUI {
 		// Create but hide the isbn13 for easy data processing
 		TableColumnModel cModel = bookTable.getColumnModel();
 		cModel.removeColumn(cModel.getColumn(0));
-		
-		
 		homePanel.add(scrollPaneTable);
+		
+		if (value != 5) {
+			tabbedPane.add("My Library", homePanel);
+		}
+		// Home Tab <Closed>
 
 		JPanel panel_1 = new JPanel();
-		
 		JButton btnClearLogs = new JButton("Clear logs");
 		panel_1.add(btnClearLogs);
 		btnClearLogs.addActionListener(new ActionListener() {
@@ -154,32 +202,39 @@ public class GUI {
 			}
 		});
 
-		jFrame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		jFrame.getContentPane().add(tabbedPane);
+		
+		progressBar = new JProgressBar();
+		progressBar.setBounds(10, 644, 226, 20);
+		jFrame.getContentPane().add(progressBar);
 		
 		jFrame.setVisible(true);
-		
-		enableAdmin(true);
 		searchTab();
-		
+		enableAdmin(value);
+		//tabbedPane.add("Admin", adminPanel);
 	}
 	
-	public void enableAdmin(boolean value) {
+	public void enableAdmin(int value) {
 		JPanel adminPanel = new JPanel();
-		tabbedPane.add("Admin", adminPanel);
+		
 		adminPanel.setLayout(null);
 
 		textAreaSystemLog = new JTextArea();
 		textAreaSystemLog.setRows(10);
-		textAreaSystemLog.setColumns(60);
+		textAreaSystemLog.setColumns(80);
 		textAreaSystemLog.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(textAreaSystemLog);
-		scrollPane.setBounds(10, 41, 486, 186);
+		scrollPane.setBounds(10, 41, 704, 186);
 		adminPanel.add(scrollPane);
 		
 		JLabel lblTransactionalLog = new JLabel("Transaction Log");
 		lblTransactionalLog.setBounds(10, 26, 96, 14);
 		adminPanel.add(lblTransactionalLog);
 		
+		//if (value == 1) {
+			tabbedPane.add("Admin", adminPanel);
+		//}
+	
 	}
 	
 	public void print(String message) {
@@ -200,17 +255,28 @@ public class GUI {
 		JPanel panel = new JPanel();
 		sTab.add(panel);
 		
-		JButton btnSearch = new JButton("Search");
+		btnSearch = new JButton("Search");
 		btnSearch.setBounds(578, 7, 65, 23);
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				addSearchRow(Bookmark.urlP.findBook(textFieldSearch.getText()));
+				new Thread() {
+	            	public void run() {
+	            		addSearchRow(Bookmark.urlP.findBook(textFieldSearch.getText()));	
+	            	}
+	            }.start();
+				
 
 			}
 		});
 		sTab.add(btnSearch);
 		
 		textFieldSearch = new JTextField();
+		textFieldSearch.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+			}
+		});
+		textFieldSearch.setText("they cage the animals at night");
 		textFieldSearch.setColumns(50);
 		textFieldSearch.setBounds(162, 8, 406, 20);
 		sTab.add(textFieldSearch);
@@ -227,7 +293,6 @@ public class GUI {
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int page = comboBox.getSelectedIndex() + 1;
-				System.out.println(page);
 				String term = lblTerm.getText();
 				clearTable();
 				addSearchRow(Bookmark.urlP.changePage(page, term));
@@ -243,21 +308,39 @@ public class GUI {
 	    	       return false; // or a condition at your choice with row and column
 	    	   }
 	    };
-		//sModel.addColumn("     ");
 		sModel.addColumn("ISBN13");
 		sModel.addColumn("Title");
 		sModel.addColumn("Author");
 		sModel.addColumn("Year Published");
+		sModel.addColumn("Publisher");
 		sModel.addColumn("Type");
-		
+
 		//sModel.addColumn("Price");
 		
 		
-		JTable table = new JTable();
+		table = new JTable();
 		table.setModel(sModel);
 		
-		
 		JScrollPane scrollPane = new JScrollPane(table);
+	
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				Book temp = null;
+				if (arg0.getClickCount() == 2) {
+					if (table.getSelectedRow() >= 0) {
+						for (int i = 0; i < data.size(); i++) {
+							if (table.getValueAt(table.getSelectedRow(), 0) == data.get(i).getISBN13()) {
+								temp = data.get(i);
+								viewBook(temp);
+								break;
+							}
+						}
+					}
+					
+				}
+			}
+		});
 		scrollPane.setBounds(10, 66, 742, 510);
 		
 		
@@ -272,39 +355,46 @@ public class GUI {
 		sTab.add(lblSearchResultsFor);
 		
 	
-		JButton btnNext = new JButton("Next");
+		btnNext = new JButton("Next");
+		btnNext.setEnabled(false);
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (comboBox.getSelectedIndex() +1 != 333) {
-					comboBox.setSelectedIndex(comboBox.getSelectedIndex() + 1);
-				}
+				if (comboBox.getSelectedIndex() +1 != 333 && (comboBox.getItemAt(comboBox.getSelectedIndex() +1) != null)) {
+					new Thread() {
+		            	public void run() {
+		            		comboBox.setSelectedIndex(comboBox.getSelectedIndex() + 1);
+		            	}
+		            }.start();
+					
+	            }		
 			}
 		});
 		btnNext.setBounds(427, 34, 55, 23);
 		sTab.add(btnNext);
 		
-		JButton btnPrev = new JButton("Prev.");
+		btnPrev = new JButton("Prev.");
+		btnPrev.setEnabled(false);
 		btnPrev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if ((comboBox.getSelectedIndex() - 1 != 333) && (comboBox.getSelectedIndex() != 0)) {
-					comboBox.setSelectedIndex(comboBox.getSelectedIndex() - 1);
-				}
+				if ((comboBox.getSelectedIndex() - 1 != 333) && (comboBox.getSelectedIndex() != 0) && (comboBox.getItemAt(comboBox.getSelectedIndex() -1) != null)) {
+					new Thread() {
+		            	public void run() {
+		            			comboBox.setSelectedIndex(comboBox.getSelectedIndex() - 1);
+		            		
+		            	}
+		            }.start();
+        		}
 			}
 		});
 		btnPrev.setBounds(265, 34, 65, 23);
 		sTab.add(btnPrev);
 		lblTerm = new JLabel("");
-		lblTerm.setBounds(112, 38, 46, 14);
+		lblTerm.setBounds(112, 38, 143, 14);
 		sTab.add(lblTerm);
 		
 		lblResults = new JLabel("Results: ");
 		lblResults.setBounds(642, 41, 110, 14);
 		sTab.add(lblResults);
-		
-		
-		
-		
-		
 		
 		sTab.add(label);
 	}
@@ -314,7 +404,6 @@ public class GUI {
 	}
 	
 	public void setPageCount(int count) {
-		System.out.println(count);
 		int pageNum = (count/30);
 		
 		String[] pageCount = new String[pageNum];
@@ -332,14 +421,16 @@ public class GUI {
 	public void setTotalCount (int count) {
 		lblResults.setText("Results: " + Integer.toString(count));
 	}
-	
-	public void addRow(String[] data) {
-	    tModel.addRow(data);
+
+	public void addBookRow(Book book) {
+		String[] data = {book.getISBN13(), book.getTitle(), book.getAuthor(), book.getPages(), book.getLocation()};
+		library.add(book);
+		tModel.addRow(data);
 	    
 	}
 	
 	public void addSearchRow(ArrayList<Book> data) {
-		
+		this.data = data;
 		clearTable();
 		setTerm();
 		for(int i = 0; i < data.size(); i++) {
@@ -360,4 +451,47 @@ public class GUI {
 	public DefaultTableModel getModel() {
 		return tModel;
 	}
+	
+	public void setProgressBarValue(int min, int max) {
+		progressBar.setMinimum(min);
+		progressBar.setMaximum(max);
+	}
+	
+	public void increaseProgressBar(int value) {
+		progressBar.setValue(progressBar.getValue() + value);
+		
+	}
+	
+	public void resetProgressBar() {
+		progressBar.setValue(0);
+	}
+	
+	public void disableButtons() {
+		comboBox.setEnabled(false);
+		btnNext.setEnabled(false);
+		btnPrev.setEnabled(false);
+		btnSearch.setEnabled(false);
+	}
+	
+	public void enableButtons() {
+		comboBox.setEnabled(true);
+		btnNext.setEnabled(true);
+		btnPrev.setEnabled(true);
+		btnSearch.setEnabled(true);
+		
+	}
+	
+	public void viewBook(Book book) {
+			new Modify(book);
+
+	}
+	
+	public void editBook(Book book) {
+			new EditBook(book);
+	}
+	
+	public void updateBook(Book book) {
+		
+	}
+	
 }

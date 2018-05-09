@@ -18,7 +18,7 @@ public class URLProcessor {
 			
 	}
 	
-	private URL generateURL(String searchTerm) {
+	private URL generateSearchURL(String searchTerm) {
 		String defaultURL = "https://www.bookdepository.com/search?searchTerm=";
 		String[] term = searchTerm.split(" ");
 		URL url = null;
@@ -39,7 +39,7 @@ public class URLProcessor {
 		return url;
 	}
 	
-	private URL generateURL(String searchTerm, int page) {
+	private URL generateSearchURL(String searchTerm, int page) {
 		String defaultURL = "https://www.bookdepository.com/search?searchTerm=";
 		String[] term = searchTerm.split(" ");
 		URL url = null;
@@ -60,62 +60,84 @@ public class URLProcessor {
 		return url;
 	}
 	
+	private URL generateBookURL(String uri) {
+		URL url = null;
+
+		try {
+			url = new URL(uri);
+		} catch (MalformedURLException e) {
+			
+			e.printStackTrace();
+		}
+		return url;
+	}
+	
 	public ArrayList<Book> findBook(String searchTerm) {
 		
 		ArrayList<Book> bookList = new ArrayList<Book>();
 
-		URL url = generateURL(searchTerm);
+		URL url = generateSearchURL(searchTerm);
 
 		InputStream content = (InputStream) getURLInputStream(url);
 		BufferedReader bReader = new BufferedReader (new InputStreamReader(content));
 		
-		String resultCount;
+		String resultCount = null;
 		String pageCount = null;
-		String image;
 		String isbn13 = null;
 		String isbn10 = null;
 		String bookName = null;
 		String bookAuthor = null;
-		String bookPublished = null;
-		double price;
+		String bookPublisher = null;
+		double price = 0;
 		String type;
-		String imgLink;
-		String totalCount = null;
+		String imgLink = null;
+		String uri = null;
+		String bookYear = null;
+		String bookPages = null;
 		
-		String searchSection = "<div class=\"tab search\">";
+
 		String dimage = "<img class=\"lazy\" data-lazy=";
 		String resultNum = "of  <span class=\"search-count\">";
 		String title = "<meta itemprop=\"name\" content=";				
 		String dauthor = "<span itemprop=\"author\"";
-		String dpublished = "<p class='published' itemprop=\"datePublished\">";
 		String dformat = "<p class=\"format\">";
 		String disbn13 = "<meta itemprop=\"isbn\" content=\"";
-		String dtype = "<p class='published'";
 		String dpage = "Showing 1 to";
+		String durl = "<div class=\"item-img\">";
+		String dprice = "<div class=\"price-wrap\">";
 		
 		try {
 			String line = bReader.readLine();
 				
 
 			while (line != null) {
-			//	System.out.println("Testing");
 				
 				if (line.trim().startsWith(dpage)) {
 					pageCount = line.trim().split(" ")[3];
-					System.out.println(line);
+
 					
 				}
 				if (line.trim().startsWith(resultNum)) { // Find the results section.
 					resultCount = line.substring(line.indexOf(">")+1, line.lastIndexOf("<")); // Gets the result number
-					totalCount = line.substring(line.indexOf(">")+1, line.lastIndexOf("<")); // Gets the result number
 					if (Integer.parseInt(resultCount) >= 10000) {
 						resultCount = "10000";
 					}
-					Bookmark.gui.setResultsCount(Integer.parseInt(resultCount));
-					Bookmark.gui.setPageCount(Integer.parseInt(resultCount));
 					int count = 0;
-
+					
 					while (count < Integer.parseInt(pageCount)) {
+						calculateProgress(Integer.parseInt(pageCount));
+						disableButtons();
+						if (line.trim().startsWith(durl)) {
+							line = bReader.readLine();
+							uri = "https://www.bookdepository.com" + line.substring(line.indexOf("<a href=\"") + 9, line.indexOf("\">"));
+							Book temp = getBookInfo(uri);
+							bookPages = temp.getPages();
+							bookPublisher = temp.getPublisher();
+							bookYear = temp.getYear();
+							isbn10 = temp.getISBN10();
+							
+						}
+						
 						if (line.trim().startsWith(dimage)) {
 							if (line.contains(".jpg")) {
 								imgLink = line.substring(line.indexOf(dimage) + 29, line.indexOf(".jpg") + 4);
@@ -139,29 +161,48 @@ public class URLProcessor {
 							bookAuthor = line.substring(line.indexOf("itemscope=\"") + 11, line.lastIndexOf("\""));
 						}
 
-						if (line.trim().startsWith(dpublished)) {
-							try {
-								line = bReader.readLine();
-								line = line.trim();
-								bookPublished = line.substring(0, line.lastIndexOf("<"));
-								bookPublished = bookPublished.split(" ")[2];
-							} catch (ArrayIndexOutOfBoundsException e) {
-									Bookmark.gui.print("Invalid Publisher date for listing");
-									bookPublished = "Unavailable";
-									continue;
-								}
-							
-						//	System.out.println(bookPublished);
-						}
 
 						if (line.trim().startsWith(dformat)) {
 							line = bReader.readLine();
 							line = line.trim();
 							type = line.substring(0, line.lastIndexOf("<"));
-						//	System.out.println(type + "\n");							
-							Book searchBook = new Book(isbn13, isbn10, bookName, bookAuthor, bookPublished, null, type, null);	
+							line = bReader.readLine();
+							line = bReader.readLine();
+							if (line.trim().startsWith(dprice)) {
+								line = bReader.readLine();
+								line = bReader.readLine();
+								if (line.trim().equals("unavailable")) {
+									price = 0.0;
+								}
+								else {
+									int lastIndex;
+									if (line.endsWith("</p>")) {
+										lastIndex = line.trim().lastIndexOf("<");
+									}
+									else {
+										lastIndex = line.trim().length();
+									}
+
+									
+									price = Double.parseDouble(line.trim().substring(line.trim().indexOf("$")+1, lastIndex ));
+								}
+								
+							}
+							Book searchBook = new Book();	
+							searchBook.setISBN13(isbn13);
+							searchBook.setISBN10(isbn10);
+							searchBook.setTitle(bookName);
+							searchBook.setAuthor(bookAuthor);
+							searchBook.setYear(bookYear);
+							searchBook.setPublisher(bookPublisher);
+							searchBook.setLink(uri);
+							searchBook.setPages(bookPages);
+							searchBook.setType(type);
+							searchBook.setPrice(price);
+							searchBook.setImage(imgLink);
 							bookList.add(searchBook);
 							count++;
+							addValue(1);
 						}
 						
 						line = bReader.readLine();  // Goto next line
@@ -180,7 +221,10 @@ public class URLProcessor {
 
 			e.printStackTrace();
 		} 
-
+		enableButtons();
+		Bookmark.gui.resetProgressBar();
+		Bookmark.gui.setResultsCount(Integer.parseInt(resultCount));
+		Bookmark.gui.setPageCount(Integer.parseInt(resultCount));
 		return bookList;
 	}
 	
@@ -188,34 +232,35 @@ public class URLProcessor {
 		
 		ArrayList<Book> bookList = new ArrayList<Book>();
 
-		URL url = generateURL(term, index);
-		System.out.println(url.toString());
+		URL url = generateSearchURL(term, index);
 
 		InputStream content = (InputStream) getURLInputStream(url);
 		BufferedReader bReader = new BufferedReader (new InputStreamReader(content));
 		
-		String resultCount;
-		int pageCount = 0;
-		String image;
+		int itemCount = 0;
 		String isbn13 = null;
 		String isbn10 = null;
 		String bookName = null;
 		String bookAuthor = null;
-		String bookPublished = null;
-		double price;
+		String bookPublisher = null;
+		double price = 0;
 		String type;
-		String imgLink;
+		String imgLink = null;
+		String uri = null;
+		String bookYear = null;
+		String bookPages = null;
 		
-		String searchSection = "<div class=\"tab search\">";
 		String dimage = "<img class=\"lazy\" data-lazy=";
 		String resultNum = "of  <span class=\"search-count\">";
 		String title = "<meta itemprop=\"name\" content=";				
 		String dauthor = "<span itemprop=\"author\"";
-		String dpublished = "<p class='published' itemprop=\"datePublished\">";
 		String dformat = "<p class=\"format\">";
 		String disbn13 = "<meta itemprop=\"isbn\" content=\"";
-		String dtype = "<p class='published'";
+
 		String dpage = "Showing ";
+		String durl = "<div class=\"item-img\">";
+		String dprice = "<div class=\"price-wrap\">";
+		
 		
 		try {
 			String line = bReader.readLine();
@@ -224,14 +269,28 @@ public class URLProcessor {
 			while (line != null) {
 				
 				if (line.trim().startsWith(dpage)) {	
-					pageCount = Integer.parseInt(line.trim().split(" ")[3]) - Integer.parseInt((line.trim().split(" ")[1])) + 1;
+					itemCount = Integer.parseInt(line.trim().split(" ")[3]) - Integer.parseInt((line.trim().split(" ")[1])) + 1;
 				}
+				
 				if (line.trim().startsWith(resultNum)) { // Find the results section.
 
 					int count = 0;
-					System.out.println(pageCount);
 
-					while (count < pageCount) {
+					while (count < itemCount) {
+						calculateProgress(itemCount);
+						disableButtons();
+						
+						if (line.trim().startsWith(durl)) {
+							line = bReader.readLine();
+							uri = "https://www.bookdepository.com" + line.substring(line.indexOf("<a href=\"") + 9, line.indexOf("\">"));
+							Book temp = getBookInfo(uri);
+							bookPages = temp.getPages();
+							bookPublisher = temp.getPublisher();
+							bookYear = temp.getYear();
+							isbn10 = temp.getISBN10();
+							
+						}
+						
 						if (line.trim().startsWith(dimage)) {
 							if (line.contains(".jpg")) {
 								imgLink = line.substring(line.indexOf(dimage) + 29, line.indexOf(".jpg") + 4);
@@ -255,26 +314,47 @@ public class URLProcessor {
 							bookAuthor = line.substring(line.indexOf("itemscope=\"") + 11, line.lastIndexOf("\""));
 						}
 
-						if (line.trim().startsWith(dpublished)) {
-							try {
-								line = bReader.readLine();
-								line = line.trim();
-								bookPublished = line.substring(0, line.lastIndexOf("<"));
-								bookPublished = bookPublished.split(" ")[2];
-							} catch (ArrayIndexOutOfBoundsException e) {
-									Bookmark.gui.print("Invalid Publisher date for listing");
-									bookPublished = "Unavailable";
-									continue;
-								}
-						}
-
 						if (line.trim().startsWith(dformat)) {
 							line = bReader.readLine();
 							line = line.trim();
-							type = line.substring(0, line.lastIndexOf("<"));				
-							Book searchBook = new Book(isbn13, isbn10, bookName, bookAuthor, bookPublished, null, type, null);	
+							type = line.substring(0, line.lastIndexOf("<"));
+							line = bReader.readLine();
+							line = bReader.readLine();
+							if (line.trim().startsWith(dprice)) {
+								line = bReader.readLine();
+								line = bReader.readLine();
+								if (line.trim().equals("unavailable")) {
+									price = 0.0;
+								}
+								else {
+									int lastIndex;
+									if (line.endsWith("</p>")) {
+										lastIndex = line.trim().lastIndexOf("<");
+									}
+									else {
+										lastIndex = line.trim().length();
+									}
+
+									
+									price = Double.parseDouble(line.trim().substring(line.trim().indexOf("$")+1, lastIndex ));
+								}
+								
+							}
+							Book searchBook = new Book();	
+							searchBook.setISBN13(isbn13);
+							searchBook.setISBN10(isbn10);
+							searchBook.setTitle(bookName);
+							searchBook.setAuthor(bookAuthor);
+							searchBook.setYear(bookYear);
+							searchBook.setPublisher(bookPublisher);
+							searchBook.setLink(uri);
+							searchBook.setPages(bookPages);
+							searchBook.setType(type);
+							searchBook.setPrice(price);
+							searchBook.setImage(imgLink);
 							bookList.add(searchBook);
 							count++;
+							addValue(1);
 						}
 						
 						line = bReader.readLine();  // Goto next line
@@ -293,27 +373,62 @@ public class URLProcessor {
 
 			e.printStackTrace();
 		} 
-
+		enableButtons();
+		Bookmark.gui.resetProgressBar();
 		return bookList;
 	
 	}
 	
-	public Book getBookInfo() {
-		String publisher;
-		String yearPublished;
-		String pages;
-		String isbn10;
-		String isbn13;
+	public Book getBookInfo(String uri) {
+
+		URL url = generateBookURL(uri);
+
+		InputStream content = (InputStream) getURLInputStream(url);
+		BufferedReader bReader = new BufferedReader (new InputStreamReader(content));
+		
+		String publisher = null;
+		String yearPublished = null;
+		String pages = null;
+		String isbn10 = null;
 		
 		String dpublisher = "<span itemprop=\"publisher\" itemtype=";
 		String dyear = "<span itemprop=\"datePublished\">";
 		String dpages = "| <span itemprop=\"numberOfPages\">";
 		String disbn10 = "<label>ISBN10</label>";
-		String disbn13 = "<label>ISBN13</label>";
+
+		try {		
+			String line = bReader.readLine();
+			while (line != null) {
+				if (line.trim().startsWith(dpages)) {
+					pages = line.substring(line.indexOf(">") + 1, line.lastIndexOf("<")).split(" ")[0];
+				}
+				if (line.trim().startsWith(dyear)) {
+					yearPublished = line.substring(line.indexOf(">") + 1, line.lastIndexOf("<")).split(" ")[2];
+
+				}
+				if (line.trim().startsWith(dpublisher)) {
+					publisher = line.substring(line.indexOf("itemscope=\"") + 11, line.lastIndexOf(">")-1);
+				}
+				
+				if (line.trim().startsWith(disbn10)) {
+					line = bReader.readLine();
+					isbn10 = line.substring(line.indexOf(">") +1, line.lastIndexOf("<"));
+				}
+				
+				
+				
+				line = bReader.readLine();
+			}	
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 		
-		
-		//Book temp = new Book();
-		return null;
+		Book temp = new Book();
+		temp.setPages(pages);
+		temp.setYear(yearPublished);
+		temp.setPublisher(publisher);
+		temp.setISBN10(isbn10);
+		return temp;
 	}
 	 
 	private InputStream getURLInputStream(URL url) {
@@ -331,5 +446,21 @@ public class URLProcessor {
 		return null;
 	}
 	
+	private void calculateProgress(int count) {
+		Bookmark.gui.setProgressBarValue(0, count);
+	}
+	
+	private void addValue(int value) {
+		Bookmark.gui.increaseProgressBar(value);
+	}
+	
+	private void enableButtons() {
+		Bookmark.gui.enableButtons();
+	}
+	
+	private void disableButtons() {
+		Bookmark.gui.disableButtons();
+	}
 
 }
+	
