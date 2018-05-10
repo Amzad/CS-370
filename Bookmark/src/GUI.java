@@ -62,12 +62,13 @@ public class GUI {
 	ArrayList<Book> data;
 	ArrayList<Book> library = new ArrayList();
 	Modify modify;
+	int searchMode = 0;
 	
 	public GUI(int value) {
 		
 		// Main frame <Open>
 		jFrame.setResizable(false);
-		jFrame.setSize(900, 725);
+		jFrame.setSize(885, 686);
 		jFrame.setLocationRelativeTo(null);
 		jFrame.getContentPane().setLayout(null);
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
@@ -127,7 +128,7 @@ public class GUI {
 		
 		// TabbedPane <Open>
 		tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-		tabbedPane.setBounds(30, 5, 833, 592);
+		tabbedPane.setBounds(10, 5, 859, 592);
 		
 		
 		// Home Tab <Open>
@@ -205,7 +206,7 @@ public class GUI {
 		jFrame.getContentPane().add(tabbedPane);
 		
 		progressBar = new JProgressBar();
-		progressBar.setBounds(10, 644, 226, 20);
+		progressBar.setBounds(10, 608, 226, 20);
 		jFrame.getContentPane().add(progressBar);
 		
 		jFrame.setVisible(true);
@@ -247,6 +248,14 @@ public class GUI {
 		
 	}
 	
+	public void processAdvancedSearch(String term) {
+		new Thread() {
+        	public void run() {
+        		addSearchRowAdvanced(Bookmark.urlP.findBookAdvanced(term), term);	
+        	}
+        }.start();
+	}
+	
 	public void searchTab() {
 		JPanel sTab = new JPanel();
 		sTab.setLayout(null);
@@ -256,9 +265,10 @@ public class GUI {
 		sTab.add(panel);
 		
 		btnSearch = new JButton("Search");
-		btnSearch.setBounds(578, 7, 65, 23);
+		btnSearch.setBounds(544, 7, 65, 23);
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				searchMode = 0;
 				new Thread() {
 	            	public void run() {
 	            		addSearchRow(Bookmark.urlP.findBook(textFieldSearch.getText()));	
@@ -278,11 +288,11 @@ public class GUI {
 		});
 		textFieldSearch.setText("they cage the animals at night");
 		textFieldSearch.setColumns(50);
-		textFieldSearch.setBounds(162, 8, 406, 20);
+		textFieldSearch.setBounds(128, 8, 406, 20);
 		sTab.add(textFieldSearch);
 		
 		JLabel label = new JLabel("Search ");
-		label.setBounds(122, 11, 36, 14);
+		label.setBounds(82, 11, 36, 14);
 		sTab.add(label);
 
 		JLabel lblNewLabel = new JLabel("Page");
@@ -295,7 +305,13 @@ public class GUI {
 				int page = comboBox.getSelectedIndex() + 1;
 				String term = lblTerm.getText();
 				clearTable();
-				addSearchRow(Bookmark.urlP.changePage(page, term));
+				if (searchMode == 0) {
+					addSearchRow(Bookmark.urlP.changePage(page, term));
+				}
+				else {
+					addSearchRow(Bookmark.urlP.changePageAdvanced(page, term));
+				}
+				
 			}
 		});
 		comboBox.setBounds(372, 35, 45, 20);
@@ -359,14 +375,26 @@ public class GUI {
 		btnNext.setEnabled(false);
 		btnNext.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (comboBox.getSelectedIndex() +1 != 333 && (comboBox.getItemAt(comboBox.getSelectedIndex() +1) != null)) {
-					new Thread() {
-		            	public void run() {
-		            		comboBox.setSelectedIndex(comboBox.getSelectedIndex() + 1);
-		            	}
-		            }.start();
-					
-	            }		
+				if (searchMode == 0) {
+					if (comboBox.getSelectedIndex() +1 != 333 && (comboBox.getItemAt(comboBox.getSelectedIndex() +1) != null)) {
+						new Thread() {
+			            	public void run() {
+			            		comboBox.setSelectedIndex(comboBox.getSelectedIndex() + 1);
+			            	}
+			            }.start();
+						
+		            }		
+				}
+				else {
+					if (comboBox.getSelectedIndex() +1 != 333 && (comboBox.getItemAt(comboBox.getSelectedIndex() +1) != null)) {
+						new Thread() {
+			            	public void run() {
+			            		comboBox.setSelectedIndex(comboBox.getSelectedIndex() + 1);
+			            	}
+			            }.start();
+						
+		            }		
+				}		
 			}
 		});
 		btnNext.setBounds(427, 34, 55, 23);
@@ -376,14 +404,26 @@ public class GUI {
 		btnPrev.setEnabled(false);
 		btnPrev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if ((comboBox.getSelectedIndex() - 1 != 333) && (comboBox.getSelectedIndex() != 0) && (comboBox.getItemAt(comboBox.getSelectedIndex() -1) != null)) {
-					new Thread() {
-		            	public void run() {
-		            			comboBox.setSelectedIndex(comboBox.getSelectedIndex() - 1);
-		            		
-		            	}
-		            }.start();
-        		}
+				if (searchMode == 0) {
+					if ((comboBox.getSelectedIndex() - 1 != 333) && (comboBox.getSelectedIndex() != 0) && (comboBox.getItemAt(comboBox.getSelectedIndex() -1) != null)) {
+						new Thread() {
+			            	public void run() {
+			            			comboBox.setSelectedIndex(comboBox.getSelectedIndex() - 1);	            		
+			            	}
+			            }.start();
+	        		}	
+				}
+				else {
+					if ((comboBox.getSelectedIndex() - 1 != 333) && (comboBox.getSelectedIndex() != 0) && (comboBox.getItemAt(comboBox.getSelectedIndex() -1) != null)) {
+						new Thread() {
+			            	public void run() {
+			            			comboBox.setSelectedIndex(comboBox.getSelectedIndex() - 1);		            		
+			            	}
+			            }.start();
+	        		}	
+
+				}
+
 			}
 		});
 		btnPrev.setBounds(265, 34, 65, 23);
@@ -397,10 +437,24 @@ public class GUI {
 		sTab.add(lblResults);
 		
 		sTab.add(label);
+		
+		JButton btnAdvancedSearch = new JButton("Advanced Search");
+		btnAdvancedSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new AdvancedSearch();
+			}
+		});
+		btnAdvancedSearch.setBounds(619, 7, 116, 23);
+		sTab.add(btnAdvancedSearch);
 	}
 	
 	public void setTerm() {
 		lblTerm.setText(textFieldSearch.getText());
+	}
+	
+	public void setTermAdvanced(String term) {
+		textFieldSearch.setText(term);
+		lblTerm.setText(term);
 	}
 	
 	public void setPageCount(int count) {
@@ -433,6 +487,19 @@ public class GUI {
 		this.data = data;
 		clearTable();
 		setTerm();
+		for(int i = 0; i < data.size(); i++) {
+			Book temp = data.get(i);
+			String[] tempS = {temp.getISBN13(), temp.getTitle(), temp.getAuthor(), temp.getYear(), temp.getPublisher(), temp.getType()};
+			sModel.addRow(tempS);
+			
+		}
+		
+	}
+	
+	public void addSearchRowAdvanced(ArrayList<Book> data, String term) {
+		this.data = data;
+		clearTable();
+		setTermAdvanced(term);
 		for(int i = 0; i < data.size(); i++) {
 			Book temp = data.get(i);
 			String[] tempS = {temp.getISBN13(), temp.getTitle(), temp.getAuthor(), temp.getYear(), temp.getPublisher(), temp.getType()};
@@ -493,5 +560,4 @@ public class GUI {
 	public void updateBook(Book book) {
 		
 	}
-	
 }

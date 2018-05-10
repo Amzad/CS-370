@@ -514,6 +514,18 @@ public class Bookmark extends Thread {
     	}
     	saveCurrentState();
     }
+    
+    public static void deleteBook(Book book) {
+    	ArrayList<Book> temp = gui.library;
+    	DefaultTableModel dModel = gui.tModel;
+    	for (int i = 0; i < temp.size(); i++) {
+    		if (dModel.getValueAt(i, 0) == book.getISBN13()) {
+    			temp.remove(i);
+    			dModel.removeRow(i);
+    		}
+    	}
+    	saveCurrentState();
+    }
 
     public static void println(String value) {
     	

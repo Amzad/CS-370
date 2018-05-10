@@ -177,7 +177,12 @@ public class EditBook extends JDialog implements ActionListener {
 		btnDeleteBook.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Bookmark.db.remove(book.getISBN13());
-				
+				Bookmark.deleteBook(book);
+				JOptionPane.showMessageDialog(null, book.getTitle() + " deleted.");
+				Bookmark.println("DELETED: " + book.getTitle() + ":" + book.getISBN13());
+				Bookmark.gui.print("DELETED: " + book.getTitle() + ":" + book.getISBN13());
+				setVisible(false);
+				Bookmark.saveCurrentState();
 			}
 		});
 		btnDeleteBook.setBounds(116, 502, 89, 23);
