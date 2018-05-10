@@ -5,13 +5,18 @@ import javax.swing.JTable;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JLabel;
-import java.awt.BorderLayout;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
-
+/**
+ * AdvancedSearch
+ * This class is a GUI used for the advanced search component of the application.
+ * @author Amzad
+ *
+ */
+@SuppressWarnings("serial")
 public class AdvancedSearch extends JDialog implements ActionListener {
 	
 	JTable modifyFrame;
@@ -21,6 +26,10 @@ public class AdvancedSearch extends JDialog implements ActionListener {
 	private JTextField textISBN;
 	private JTextField textPublisher;
 	
+	/**
+	 * Default constructor starts the advanced search GUI.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public AdvancedSearch() {
 		addWindowListener(new WindowAdapter() {
 			@Override
@@ -110,7 +119,9 @@ public class AdvancedSearch extends JDialog implements ActionListener {
 					searchTerm = searchTerm + "searchIsbn=" + textISBN.getText().trim() + "&";
 				}
 				String lang = (String) comboBox.getItemAt(comboBox.getSelectedIndex());
-				String comboValue = "123";
+				String comboValue = "123"; // Default language code for English
+				
+				// The for loops sets the language code according to the website.
 				if (lang.equals("English")) comboValue = "123";
 				if (lang.equals("French")) comboValue = "137";
 				if (lang.equals("Spanish")) comboValue = "404";
@@ -119,9 +130,9 @@ public class AdvancedSearch extends JDialog implements ActionListener {
 				if (lang.equals("Italian")) comboValue = "202";
 				
 				searchTerm = searchTerm + "searchLang=" + comboValue + "&advanced=true";
-				Bookmark.gui.searchMode = 1;
+				Bookmark.gui.searchMode = 1; // Set gui to advanced mode for future.
 				Bookmark.gui.processAdvancedSearch(searchTerm);
-				setVisible(false);
+				setVisible(false); // Hide the gui. Return to main gui.
 			}
 		});
 		btnSearch.setBounds(183, 101, 89, 23);

@@ -6,18 +6,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-
+/**
+ * This class is responsible for all web related processing based on a URL.
+ * @author Amzad
+ *
+ */
 public class URLProcessor {
 	
-	
+	/**
+	 * Default constructor
+	 */
 	public URLProcessor() {
+	}
 
-	}
-	
-	public void displayURLInfo(String url) {
-			
-	}
-	
+	/**
+	 * This method creates a URL object with the search term. 
+	 * @param searchTerm Search Term.
+	 * @return URL
+	 */
 	private URL generateSearchURL(String searchTerm) {
 		String defaultURL = "https://www.bookdepository.com/search?searchTerm=";
 		String[] term = searchTerm.split(" ");
@@ -39,6 +45,12 @@ public class URLProcessor {
 		return url;
 	}
 	
+	/**
+	 * This method creates a URL object with the search term.
+	 * @param searchTerm Search Term
+	 * @param page Which page to go to.
+	 * @return URL Object
+	 */
 	private URL generateSearchURL(String searchTerm, int page) {
 		String defaultURL = "https://www.bookdepository.com/search?searchTerm=";
 		String[] term = searchTerm.split(" ");
@@ -60,6 +72,11 @@ public class URLProcessor {
 		return url;
 	}
 	
+	/**
+	 * This method creates a URL object with the search term. 
+	 * @param searchTerm Search Term.
+	 * @return URL
+	 */
 	private URL generateAdvancedSearchURL(String searchTerm) {
 		String defaultURL = "https://www.bookdepository.com/search?";
 		URL url = null;
@@ -75,6 +92,12 @@ public class URLProcessor {
 		return url;
 	}
 	
+	/**
+	 * This method creates a URL object with the search term.
+	 * @param searchTerm Search Term
+	 * @param page Which page to go to.
+	 * @return URL Object
+	 */
 	private URL generateAdvancedSearchURL(String searchTerm, int page) {
 		String defaultURL = "https://www.bookdepository.com/search?";
 		URL url = null;
@@ -88,7 +111,11 @@ public class URLProcessor {
 		}
 		return url;
 	}
-	
+	/**
+	 * Generates a url for a specific Book.
+	 * @param uri Book link
+	 * @return URL Object
+	 */
 	private URL generateBookURL(String uri) {
 		URL url = null;
 
@@ -101,6 +128,11 @@ public class URLProcessor {
 		return url;
 	}
 	
+	/**
+	 * This method finds the results for the search team. 
+	 * @param searchTerm Term
+	 * @return ArrayList containing the results.
+	 */
 	public ArrayList<Book> findBook(String searchTerm) {
 		
 		ArrayList<Book> bookList = new ArrayList<Book>();
@@ -257,6 +289,13 @@ public class URLProcessor {
 		return bookList;
 	}
 	
+
+	/**
+	 * This method finds the results for the search team on a specific page.
+	 * @param index Page
+	 * @param searchTerm Term
+	 * @return ArrayList containing the results.
+	 */
 	public ArrayList<Book> changePage(int index, String term) {
 		
 		ArrayList<Book> bookList = new ArrayList<Book>();
@@ -408,6 +447,11 @@ public class URLProcessor {
 	
 	}
 	
+	/**
+	 * This method returns a book object containing specific information of a book from its page.
+	 * @param uri Link to the Book
+	 * @return Book object with data
+	 */
 	public Book getBookInfo(String uri) {
 
 		URL url = generateBookURL(uri);
@@ -459,7 +503,12 @@ public class URLProcessor {
 		temp.setISBN10(isbn10);
 		return temp;
 	}
-
+	
+	/**
+	 * This method finds the results for the search team. 
+	 * @param searchTerm Term
+	 * @return ArrayList containing the results.
+	 */
 	public ArrayList<Book> findBookAdvanced(String searchTerm) {
 
 		ArrayList<Book> bookList = new ArrayList<Book>();
@@ -607,7 +656,13 @@ public class URLProcessor {
 		Bookmark.gui.setPageCount(Integer.parseInt(resultCount));
 		return bookList;
 	}
-
+	
+	/**
+	 * This method finds the results for the search team on a specific page.
+	 * @param index Page
+	 * @param searchTerm Term
+	 * @return ArrayList containing the results.
+	 */
 	public ArrayList<Book> changePageAdvanced(int index, String term) {
 
 		ArrayList<Book> bookList = new ArrayList<Book>();
@@ -753,6 +808,11 @@ public class URLProcessor {
 
 	}
 
+	/**
+	 * Generates the inputstream of data for the application
+	 * @param url Link to get data from
+	 * @return InputStream
+	 */
 	private InputStream getURLInputStream(URL url) {
         URLConnection openConnection;
 		try {
@@ -768,18 +828,33 @@ public class URLProcessor {
 		return null;
 	}
 	
+	/**
+	 * Calculates the max value of the progress bar.
+	 * @param count Max Value
+	 */
 	private void calculateProgress(int count) {
 		Bookmark.gui.setProgressBarValue(0, count);
 	}
 	
+	
+	/**
+	 * Increases the progressbar by a set amount.
+	 * @param value
+	 */
 	private void addValue(int value) {
 		Bookmark.gui.increaseProgressBar(value);
 	}
 	
+	/**
+	 * Enables the gui buttons after URL processing
+	 */
 	private void enableButtons() {
 		Bookmark.gui.enableButtons();
 	}
 	
+	/**
+	 * Disables the gui buttons during URL processing
+	 */
 	private void disableButtons() {
 		Bookmark.gui.disableButtons();
 	}

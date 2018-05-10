@@ -1,1 +1,2 @@
-Amzad | Amzad | Admin
+Admin | Admin | Admin
+Amzad | Amzad | User 

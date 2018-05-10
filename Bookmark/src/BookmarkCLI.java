@@ -9,11 +9,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * This class handles the CLI inputs and processing for the inputs.
+ * @author Amzad
+ *
+ */
 public class BookmarkCLI {
 	Database db; // Create database
 	Scanner input;
 	String inputFile = null; // Stores input file name/location
 	String outputFile = null; // Stores output name/location
+	String username;
+	String password;
 	
 	FileReader loadFile;
 	BufferedReader readFile;
@@ -33,6 +40,14 @@ public class BookmarkCLI {
 
 			if (args[i].startsWith("-o")) {  // Flag for output
 				outputFile = args[i++]; // The name/filepath of the output file.
+			}
+			
+			if (args[i].startsWith("-u")) {  // Flag for output
+				username = args[i++]; // The name/filepath of the output file.
+			}
+			
+			if (args[i].startsWith("-p")) {  // Flag for output
+				password = args[i++]; // The name/filepath of the output file.
 			}
 
 		}
@@ -64,9 +79,9 @@ public class BookmarkCLI {
 			} 
 
 			else if (command.toLowerCase().equals("a")) { // Check for A
-				String isbn; // Sting to store the new isbn10 number
+				String isbn; // Sting to store the new ISBN13 number
 				String name; // Sting to store the new book title.
-				System.out.println("Enter the ISBN10 of the item");
+				System.out.println("Enter the ISBN13 of the item");
 				isbn = input.next();
 				input.nextLine();
 
@@ -82,23 +97,23 @@ public class BookmarkCLI {
 				String newISBN;
 				String newName;
 
-				System.out.println("Enter the current ISBN10 to modify");
+				System.out.println("Enter the current ISBN13 to modify");
 				isbn = input.next();
 				input.nextLine();
 				if (!db.ifExists(isbn)) {
-					System.out.println("A book containing ISBN10: " + " doesn't exist.");
+					System.out.println("A book containing ISBN13: " + " doesn't exist.");
 				} else {
-					System.out.println("Pick an option \n I - Change ISBN10 Number \n N - Change book name");
+					System.out.println("Pick an option \n I - Change ISBN13 Number \n N - Change book name");
 					option = input.next();
 					input.nextLine();
 					if (option.toLowerCase().equals("i")) {
-						System.out.println("Enter the new ISBN10 number");
+						System.out.println("Enter the new ISBN13 number");
 						newISBN = input.next();
 						input.nextLine();
 						
 						
 						Book oldBook = db.modifyBookISBN(isbn, newISBN);
-						System.out.println("ISBN10:" + isbn + " changed to ISBN10:" + newISBN + " for " + oldBook.getTitle());
+						System.out.println("ISBN10:" + isbn + " changed to ISBN13:" + newISBN + " for " + oldBook.getTitle());
 						
 						
 					} else if (option.toLowerCase().equals("n")) {
@@ -149,9 +164,16 @@ public class BookmarkCLI {
 		}	
 	}
 	
+	/**
+	 * This method reads the input file from the command line for processing into the database.
+	 * @param file
+	 */
 	public void readFile(String file) {
-		String name;
-		String isbn;
+		String title;
+		String isbn13;
+		String author;
+		String publisher;
+		String year;
 		
 		//File inputFile = new File(file);
 		try {
@@ -165,10 +187,18 @@ public class BookmarkCLI {
 			// If the line isn't empty, process the data.
 			while ((inputLine = readFile.readLine()) != null) {
 				String[] info = inputLine.split(delimiter);
-				isbn = info[0].trim(); // Remove starting and trailing white spaces.
-				name = info[1].trim(); // Remove starting and trailing white spaces.
+				isbn13 = info[0].trim(); // Remove starting and trailing white spaces.
+				title = info[1].trim(); // Remove starting and trailing white spaces.
+				author = info[2].trim();
+				publisher = info[3].trim();
+				year = info[4].trim();
 				
-				Book tempBook = new Book(name, isbn); // Create a new Book object with the name and isbn10 number
+				Book tempBook = new Book(); // Create a new Book object with the name and isbn13 number
+				tempBook.setTitle(title);
+				tempBook.setAuthor(author);
+				tempBook.setPublisher(publisher);
+				tempBook.setYear(year);
+				tempBook.setISBN13(isbn13);
 				db.add(tempBook); // Add the new Book object to the database.
 				System.out.println(tempBook.getTitle() + " added to the database");
 			}
@@ -192,6 +222,10 @@ public class BookmarkCLI {
 		System.out.println("Database creation completed");
 	} // END:readFile
 	
+	/**
+	 * This method outputs a list of the current database items into the output file.
+	 * @param outputFile
+	 */
 	public void writeFile(String outputFile) {
 		try {
 			makeFile = new FileWriter(outputFile);
@@ -203,7 +237,7 @@ public class BookmarkCLI {
 				Map.Entry pair = (Map.Entry)it.next();
 				Book temp = (Book) pair.getValue();
 				
-				writeFile.write(temp.getISBN10() + "|" + temp.getTitle());
+				writeFile.write(temp.getISBN13() + "|" + temp.getTitle() + "|" + temp.getAuthor() + "|" + temp.getPublisher() + "|" + temp.getYear());
 				writeFile.newLine();
 			}
 		} catch (IOException e) {

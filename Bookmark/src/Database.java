@@ -9,7 +9,11 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-
+/**
+ * This class handles the database and transactions of the database.
+ * @author Amzad
+ *
+ */
 public class Database {
 	HashMap<String, Object> hmap = new HashMap<String, Object>();
 	
@@ -21,6 +25,9 @@ public class Database {
 	 * 3 - Author
 	 * 4 - Published Year
 	 * 5 - Publisher
+	 */
+	/**
+	 * Default Database Constructor
 	 */
 	public Database() {
 		
@@ -47,16 +54,7 @@ public class Database {
 		return newBook;
 		
 	}
-	
-	public Book newBook(String isbn13, String name, String author, String year) {
-	    Book newBook = new Book();
-	    newBook.setISBN13(isbn13);
-	    newBook.setTitle(name);
-	    newBook.setAuthor(author);
-	    newBook.setYear(year);
-	    return newBook;
-	}
-	
+
 	/**
 	 * Modifies the ISBN13 number of an existing book
 	 * @param isbn The current ISBN13 number
@@ -105,6 +103,11 @@ public class Database {
 		return null;
 	}
 	
+	/**
+	 * Replaces a book object with a book object of itself with modified data.
+	 * @param book
+	 * @return Modifed Book
+	 */
 	public Book replaceBook(Book book) {
 		hmap.put(book.getISBN13(), book);	
 		Bookmark.println("MODIFED: " + book.getTitle() + ":" + book.getAuthor());
@@ -162,10 +165,18 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Return the current database.
+	 * @return Hashmap
+	 */
 	public HashMap getDatabase() {
 		return hmap;
 	}
 	
+	/**
+	 * Saves the image into the image directory.
+	 * @param link Link to the image.
+	 */
 	public void saveImage(String link) {
 		URL url;
 		try {

@@ -1,33 +1,26 @@
-import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 
-import javax.swing.JSplitPane;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
 import javax.swing.border.MatteBorder;
-import javax.swing.SwingConstants;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 
+/**
+ * This class handles the user authenication of the application.
+ * @author Amzad
+ *
+ */
+@SuppressWarnings("serial")
 public class Login extends JDialog implements ActionListener {
 	
 	JFrame jFrame = new JFrame("Login");
@@ -38,6 +31,9 @@ public class Login extends JDialog implements ActionListener {
 	private JTextField textNewPassword;
 	private JTextField textNewUser;
 
+	/**
+	 * Creates the form.
+	 */
 	public Login() {
 		jFrame.setSize(290, 471);
 		jFrame.getContentPane().setLayout(null);
@@ -60,7 +56,6 @@ public class Login extends JDialog implements ActionListener {
 		panel.add(lblNewLabel);
 
 		textExistingUser = new JTextField();
-		textExistingUser.setText("Amzad");
 		textExistingUser.setBounds(71, 33, 171, 20);
 		panel.add(textExistingUser);
 		textExistingUser.setColumns(10);
@@ -72,7 +67,6 @@ public class Login extends JDialog implements ActionListener {
 		panel.add(lblNewLabel_1);
 
 		textExistingPassword = new JTextField();
-		textExistingPassword.setText("Amzad");
 		textExistingPassword.setBounds(71, 61, 171, 20);
 		panel.add(textExistingPassword);
 		textExistingPassword.setColumns(10);
@@ -185,9 +179,5 @@ public class Login extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 
-	}
-
-	public void readFile() {
-		
 	}
 }

@@ -1,40 +1,22 @@
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JToolBar;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import java.awt.Dimension;
-import javax.swing.JFormattedTextField;
 import javax.swing.JScrollPane;
-import javax.swing.DropMode;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JButton;
-import java.awt.Component;
-import java.awt.ScrollPane;
 import javax.swing.JTable;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import javax.swing.JSeparator;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -60,10 +42,11 @@ public class GUI {
 	JButton btnPrev;
 	JButton btnSearch;
 	ArrayList<Book> data;
-	ArrayList<Book> library = new ArrayList();
+	ArrayList<Book> library = new ArrayList<Book>();
 	Modify modify;
 	int searchMode = 0;
 	
+	@SuppressWarnings("serial")
 	public GUI(int value) {
 		
 		// Main frame <Open>
@@ -104,6 +87,19 @@ public class GUI {
 		});
 		
 		JMenuItem mntmGenerateReport = new JMenuItem("Generate Report");  // Generate Report
+		mntmGenerateReport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String email, subject, contents = "Hello, this report is generated list of items in the library. \n\n";
+				email = JOptionPane.showInputDialog("Enter the recipient email");
+				subject = "Your generated report from " + Bookmark.currentUser;
+				for (int i = 0; i < library.size(); i++) {
+					contents = contents + "Book: " + library.get(i).getTitle() + "\nAuthor: " + library.get(i).getAuthor() + "\nPublisher: " + library.get(i).getPublisher() 
+							+ "\nYear Published: " + library.get(i).getYear() + "\nISBN13: " + library.get(i).getISBN13() + "\n\n";
+				}
+				System.out.println(contents);
+				new Email(email, subject, contents);
+			}
+		});
 		mnFile.add(mntmGenerateReport);
 		
 		JSeparator separator = new JSeparator();
@@ -118,7 +114,6 @@ public class GUI {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				JOptionPane.showMessageDialog(null, "This program was created by \n Amzad Chowdhury \n for CS370 at Queens College.");
-				Bookmark.saveCurrentState();
 			}
 		});
 		menuBar.add(mnAbout);
@@ -256,6 +251,7 @@ public class GUI {
         }.start();
 	}
 	
+	@SuppressWarnings("serial")
 	public void searchTab() {
 		JPanel sTab = new JPanel();
 		sTab.setLayout(null);
@@ -286,7 +282,6 @@ public class GUI {
 			public void keyPressed(KeyEvent arg0) {
 			}
 		});
-		textFieldSearch.setText("they cage the animals at night");
 		textFieldSearch.setColumns(50);
 		textFieldSearch.setBounds(128, 8, 406, 20);
 		sTab.add(textFieldSearch);
@@ -457,6 +452,7 @@ public class GUI {
 		lblTerm.setText(term);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public void setPageCount(int count) {
 		int pageNum = (count/30);
 		

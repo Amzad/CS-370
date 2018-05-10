@@ -2,9 +2,7 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-
 import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.JLabel;
@@ -13,13 +11,18 @@ import javax.swing.JTextField;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This class is GUI for the EditBook component which lets a user edit a Book object in the library.
+ * @author Amzad
+ *
+ */
+@SuppressWarnings("serial")
 public class EditBook extends JDialog implements ActionListener {
 	
 	JTable modifyFrame;
@@ -33,6 +36,10 @@ public class EditBook extends JDialog implements ActionListener {
 	private JTextField textFieldISBN10;
 	private JTextField textFieldISBN13;
 	
+	/**
+	 * Default Constructor. It displays the book details given the input book object.
+	 * @param book
+	 */
 	public EditBook(Book book) {
 		addWindowListener(new WindowAdapter() {
 			@Override
